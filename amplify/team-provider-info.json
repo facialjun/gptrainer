@@ -1,0 +1,20 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-gptrainer-staging-41658-authRole",
+      "UnauthRoleArn": "arn:aws:iam::370870007882:role/amplify-gptrainer-staging-41658-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::370870007882:role/amplify-gptrainer-staging-41658-authRole",
+      "Region": "ap-northeast-2",
+      "DeploymentBucketName": "amplify-gptrainer-staging-41658-deployment",
+      "UnauthRoleName": "amplify-gptrainer-staging-41658-unauthRole",
+      "StackName": "amplify-gptrainer-staging-41658",
+      "StackId": "arn:aws:cloudformation:ap-northeast-2:370870007882:stack/amplify-gptrainer-staging-41658/354f7f20-daa7-11ee-b378-06ecdf38fe07",
+      "AmplifyAppId": "d3osa90z3o0h4f"
+    },
+    "categories": {
+      "auth": {
+        "gptrainer": {}
+      }
+    }
+  }
+}
