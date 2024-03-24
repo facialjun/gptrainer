@@ -18,6 +18,12 @@ import TRReservationscreen from '../trainerscreens/TRReservationscreen';
 import SplashScreen from '../trainerscreens/SplashScreen';
 import ForgotPasswordScreen from '../trainerscreens/ForgotPasswordscreen';
 import NewPasswordScreen from '../trainerscreens/NewPasswordScreen';
+import LessonRequestScreen from '../trainerscreens/LessonRequestScreen';
+import LessonTodayScreen from '../trainerscreens/LessonTodayScreen';
+import LessonConfirmScreen from '../trainerscreens/LessonConfirmScreen';
+import AllMemberScreen from '../trainerscreens/AllMemberScreen';
+import ReregisterMemberScreen from '../trainerscreens/ReregisterMemberScreen';
+import OpenLessonScreen from '../trainerscreens/OpenLessonScreen';
 
 
 
@@ -31,7 +37,14 @@ export enum TRMainScreens {
     TRhome = 'TRhome',
     TRReservation= 'TRReservation',
     TRChat= 'TRChat',
-    TRInfo ='TRInfo'
+    TRInfo ='TRInfo',
+    LessonRequest = 'LessonRequest',
+    LessonToday='LessonToday',
+    LessonConfirm='LessonConfirm',
+    AllMember='AllMember',
+    ReregisterMember='ReregisterMember',
+    OpenLesson='OpenLesson'
+
 };
 
 
@@ -46,6 +59,12 @@ export type TRMainStackParamList = {
     TRChat : undefined;
     TRReservation: undefined;
     TRInfo: undefined;
+    LessonRequest:undefined;
+    LessonToday:undefined;
+    LessonConfirm:undefined;
+    AllMember:undefined;
+    ReregisterMember:undefined;
+    OpenLesson:undefined;
 }
 
 type TRMainTabParamList= {
@@ -173,6 +192,12 @@ const TRMainStackNavigator: React.FunctionComponent = () => {
             <TRMainStack.Screen name={TRMainScreens.TRsu} component={TRsignupStackNavigator}/>
             <TRMainStack.Screen name ={TRMainScreens.TRMain} component={TRMainTabNavigator}/>
             <TRMainStack.Screen name={TRMainScreens.TRhome} component={TRhomescreen} />
+            <TRMainStack.Screen name={TRMainScreens.LessonRequest} component={LessonRequestScreen} />
+            <TRMainStack.Screen name={TRMainScreens.LessonToday} component={LessonTodayScreen} />
+            <TRMainStack.Screen name={TRMainScreens.LessonConfirm} component={LessonConfirmScreen} />
+            <TRMainStack.Screen name={TRMainScreens.AllMember} component={AllMemberScreen} />
+            <TRMainStack.Screen name={TRMainScreens.ReregisterMember} component={ReregisterMemberScreen} />
+            <TRMainStack.Screen name={TRMainScreens.OpenLesson} component={OpenLessonScreen} />
         </TRMainStack.Navigator>
     </NavigationContainer>
     );

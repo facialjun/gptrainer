@@ -18,7 +18,6 @@ interface NewPassWordScreenProps {
 };
 
 
-
 const ConfirmResetPasswordScreen: React.FunctionComponent<NewPassWordScreenProps> = ({ navigation }) => {
     const [code, setCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -109,25 +108,7 @@ const ConfirmResetPasswordScreen: React.FunctionComponent<NewPassWordScreenProps
 
         </View>
         </View>
-        // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        //     <Text>확인 코드 입력</Text>
-        //     <TextInput
-        //         value={code}
-        //         onChangeText={setCode}
-        //         placeholder="확인 코드"
-        //         style={{ width: 200, height: 40, borderColor: 'gray', borderWidth: 1 }}
-        //     />
-        //     <TextInput
-        //         value={newPassword}
-        //         onChangeText={setNewPassword}
-        //         placeholder="새 비밀번호"
-        //         secureTextEntry={true}
-        //         style={{ width: 200, height: 40, borderColor: 'gray', borderWidth: 1, marginTop: 10 }}
-        //     />
-        //     <TouchableOpacity onPress={handleSubmit} style={{ marginTop: 20, backgroundColor: 'blue', padding: 10 }}>
-        //         <Text style={{ color: 'white' }}>제출</Text>
-        //     </TouchableOpacity>
-        // </View>
+        
     );
 };
 
