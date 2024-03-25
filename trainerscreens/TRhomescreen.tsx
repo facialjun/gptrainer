@@ -51,7 +51,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
         <View style={{flexDirection:'row',justifyContent:'space-between'}}>
           <View style={{width:100,height:100}}>
             <TouchableOpacity 
-              onPress={()=>{navigation.navigate(TRMainScreens.LessonRequest)}}
+              onPress={()=>{navigation.navigate(TRMainScreens.LessonRequestMain)}}
               style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
               <Text>
                 2
@@ -65,7 +65,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
 
           <View style={{width:100,height:100}}>
             <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.LessonToday)}}
+            onPress={()=>{navigation.navigate(TRMainScreens.LessonTodayMain)}}
             style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
               <Text>
                 10
@@ -79,7 +79,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
 
           <View style={{width:100,height:100}}>
             <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.LessonConfirm)}}
+            onPress={()=>{navigation.navigate(TRMainScreens.LessonConfirmMain)}}
             style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
               <Text>
                 3
@@ -102,7 +102,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
         <View style={{flexDirection:'row',justifyContent:'space-between'}}>
           <View style={{width:100,height:100}}>
             <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.AllMember)}}
+            onPress={()=>{navigation.navigate(TRMainScreens.AllMemberMain)}}
             style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
               <Text>
                 10
@@ -114,9 +114,24 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
             </TouchableOpacity>
           </View>
 
+          {/* <View style={{width:100,height:100}}>
+            <TouchableOpacity 
+            onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMemberMain)}}
+            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
+              <Text>
+                2
+              </Text>
+              
+              <Text>
+                신규요청
+              </Text>
+            </TouchableOpacity>
+          </View> */}
+
+
           <View style={{width:100,height:100}}>
             <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMember)}}
+            onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMemberMain)}}
             style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
               <Text>
                 3
@@ -131,7 +146,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
         </View>
       </View>
       
-        <TouchableOpacity onPress={()=>{navigation.navigate(TRMainScreens.OpenLesson)}}>
+        <TouchableOpacity onPress={()=>{navigation.navigate(TRMainScreens.OpenLessonMain)}}>
           <View style={{backgroundColor:'#4169E1',height:screenHeight*0.1,marginTop:'7%',width:screenWidth*0.9,borderRadius:10}}>
               <Text style={{fontSize:18,fontWeight:'bold',color:'white'}}>수업개설</Text>
               <Text style={{fontSize:13,color:'white',marginTop:'1%'}}>수업을 개설하고, 수익을 창출해보세요!</Text>

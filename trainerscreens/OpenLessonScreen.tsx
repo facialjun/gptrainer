@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
-import { View,Text, BackHandler, Dimensions } from 'react-native'
-import { TRMainScreens, TRMainStackParamList } from '../stacks/Navigator';
+import { View,Text, BackHandler, Dimensions,TouchableOpacity } from 'react-native'
+import { OpenLessonMainStackParamList, OpenLessonMainScreens } from '../stacks/Navigator';
 import { StackNavigationProp } from '@react-navigation/stack';
+
 
 
 const screenWidth = Dimensions.get('screen').width;
@@ -12,15 +13,15 @@ const screenHeight = Dimensions.get('screen').height;
 //////////////////////////////////////////////////////////////// 코드 타입정의
 
 type OpenLessonScreenNavigationProps = StackNavigationProp<
-    TRMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
+    OpenLessonMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
     'OpenLesson' 
 >;
 
-interface OpenLessonrScreenProps {
+interface OpenLessonScreenProps {
   navigation: OpenLessonScreenNavigationProps; // 네비게이션 속성에 대한 타입으로 방금 지정해주었던 MainScreenNavigationProps 을 지정
 };
 
-const OpenLessonScreen:React.FunctionComponent<OpenLessonrScreenProps> = ({navigation}) => {
+const OpenLessonScreen:React.FunctionComponent<OpenLessonScreenProps> = ({navigation}) => {
 
     useEffect(() => {
             const backAction = () => {
@@ -36,8 +37,21 @@ const OpenLessonScreen:React.FunctionComponent<OpenLessonrScreenProps> = ({navig
             return () => backHandler.remove();
         }, [navigation]); // 의존성 배열에 navigation 추가
 
+
+        
     return (
-        <View><Text>OpenLessonScreen</Text></View>
+        <View style={{justifyContent:'center',alignItems:'center',flex:1}}>
+            <Text style={{fontSize:18,fontWeight:'bold'}}>수업 개설하기</Text>
+            
+            <View style={{width:screenWidth*0.3,height:50}}>
+                <TouchableOpacity 
+                onPress={()=>{navigation.navigate(OpenLessonMainScreens.AdjustLessonTime)}}
+                style={{width:screenWidth*0.3,height:screenHeight*0.06,backgroundColor:'white',borderRadius:15,justifyContent:'center',alignItems:'center'}}>
+                    <Text>수업 개설하기</Text>
+                </TouchableOpacity>
+            </View>
+
+        </View>
     )
 }
 

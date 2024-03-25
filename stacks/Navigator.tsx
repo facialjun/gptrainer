@@ -24,6 +24,7 @@ import LessonConfirmScreen from '../trainerscreens/LessonConfirmScreen';
 import AllMemberScreen from '../trainerscreens/AllMemberScreen';
 import ReregisterMemberScreen from '../trainerscreens/ReregisterMemberScreen';
 import OpenLessonScreen from '../trainerscreens/OpenLessonScreen';
+import AdjustLessonTimeScreen from '../trainerscreens/AdjustLessonTimeScreen';
 
 
 
@@ -38,12 +39,12 @@ export enum TRMainScreens {
     TRReservation= 'TRReservation',
     TRChat= 'TRChat',
     TRInfo ='TRInfo',
-    LessonRequest = 'LessonRequest',
-    LessonToday='LessonToday',
-    LessonConfirm='LessonConfirm',
-    AllMember='AllMember',
-    ReregisterMember='ReregisterMember',
-    OpenLesson='OpenLesson'
+    LessonRequestMain = 'LessonRequestMain',
+    LessonTodayMain ='LessonTodayMain',
+    LessonConfirmMain ='LessonConfirmMain',
+    AllMemberMain ='AllMemberMain',
+    ReregisterMemberMain='ReregisterMemberMain',
+    OpenLessonMain='OpenLessonMain'
 
 };
 
@@ -59,12 +60,12 @@ export type TRMainStackParamList = {
     TRChat : undefined;
     TRReservation: undefined;
     TRInfo: undefined;
-    LessonRequest:undefined;
-    LessonToday:undefined;
-    LessonConfirm:undefined;
-    AllMember:undefined;
-    ReregisterMember:undefined;
-    OpenLesson:undefined;
+    LessonRequestMain:undefined;
+    LessonTodayMain:undefined;
+    LessonConfirmMain:undefined;
+    AllMemberMain:undefined;
+    ReregisterMemberMain:undefined;
+    OpenLessonMain:undefined;
 }
 
 type TRMainTabParamList= {
@@ -89,6 +90,56 @@ export type TRsignupStackParamList = {
     TRcontraction: undefined;
 };
 
+export enum LessonRequestMainScreens {
+    LessonRequest ='LessonRequest'
+};
+
+export type LessonRequestMainStackParamList = {
+    LessonRequest:undefined;
+};
+
+export enum LessonTodayMainScreens {
+    LessonToday ='LessonToday'
+};
+
+export type LessonTodayMainStackParamList = {
+    LessonToday:undefined;
+};
+
+export enum LessonConfirmMainScreens {
+    LessonConfirm ='LessonConfirm'
+};
+
+export type LessonConfirmMainStackParamList = {
+    LessonConfirm:undefined;
+};
+
+
+export enum OpenLessonMainScreens {
+    OpenLesson = 'OpenLesson',
+    AdjustLessonTime ='AdjustLessonTime'
+};
+
+export type OpenLessonMainStackParamList = {
+    OpenLesson: undefined;
+    AdjustLessonTime:undefined;
+};
+
+export enum AllMemberMainScreens {
+    AllMember ='AllMember'
+};
+
+export type AllMemberMainStackParamList = {
+    AllMember:undefined;
+};
+
+export enum ReregisterMemberMainScreens {
+    ReregisterMember ='ReregisterMember'
+};
+
+export type ReregisterMemberMainStackParamList = {
+    ReregisterMember:undefined;
+};
 
 
 
@@ -96,6 +147,12 @@ export type TRsignupStackParamList = {
 const TRMainStack = createNativeStackNavigator<TRMainStackParamList>();
 const TRMainTab = createBottomTabNavigator<TRMainTabParamList>();
 const TRsignupStack = createNativeStackNavigator<TRsignupStackParamList>();
+const LessonRequestMainStack = createNativeStackNavigator<LessonRequestMainStackParamList>();
+const LessonTodayMainStack = createNativeStackNavigator<LessonTodayMainStackParamList>();
+const LessonConfirmMainStack = createNativeStackNavigator<LessonConfirmMainStackParamList>();
+const OpenLessonMainStack = createNativeStackNavigator<OpenLessonMainStackParamList>();
+const AllMemberMainStack = createNativeStackNavigator<AllMemberMainStackParamList>();
+const ReregisterMainStack = createNativeStackNavigator<ReregisterMemberMainStackParamList>();
 
 
 
@@ -137,8 +194,8 @@ function TRMainTabNavigator(): React.ReactElement {
                 component={TRReservationscreen}
                 options={{
                     headerShown: false,
-                    title:'내 예약',
-                    tabBarLabel: '내 예약',
+                    title:'수업',
+                    tabBarLabel: '수업',
                     tabBarIcon: ({ focused }) => (
                         focused
                         ? <Icon4 name="calendar-number-sharp" size={26} color='black' />
@@ -192,12 +249,12 @@ const TRMainStackNavigator: React.FunctionComponent = () => {
             <TRMainStack.Screen name={TRMainScreens.TRsu} component={TRsignupStackNavigator}/>
             <TRMainStack.Screen name ={TRMainScreens.TRMain} component={TRMainTabNavigator}/>
             <TRMainStack.Screen name={TRMainScreens.TRhome} component={TRhomescreen} />
-            <TRMainStack.Screen name={TRMainScreens.LessonRequest} component={LessonRequestScreen} />
-            <TRMainStack.Screen name={TRMainScreens.LessonToday} component={LessonTodayScreen} />
-            <TRMainStack.Screen name={TRMainScreens.LessonConfirm} component={LessonConfirmScreen} />
-            <TRMainStack.Screen name={TRMainScreens.AllMember} component={AllMemberScreen} />
-            <TRMainStack.Screen name={TRMainScreens.ReregisterMember} component={ReregisterMemberScreen} />
-            <TRMainStack.Screen name={TRMainScreens.OpenLesson} component={OpenLessonScreen} />
+            <TRMainStack.Screen name={TRMainScreens.LessonRequestMain} component={LessonRequestMainStackNavigator} />
+            <TRMainStack.Screen name={TRMainScreens.LessonTodayMain} component={LessonTodayMainStackNavigator} />
+            <TRMainStack.Screen name={TRMainScreens.LessonConfirmMain} component={LessonConfirmMainStackNavigator} />
+            <TRMainStack.Screen name={TRMainScreens.AllMemberMain} component={AllMemberMainStackNavigator} />
+            <TRMainStack.Screen name={TRMainScreens.ReregisterMemberMain} component={ReregisterMainStackNavigator} />
+            <TRMainStack.Screen name={TRMainScreens.OpenLessonMain} component={OpenLessonMainStackNavigator} />
         </TRMainStack.Navigator>
     </NavigationContainer>
     );
@@ -212,6 +269,62 @@ const TRsignupStackNavigator: React.FunctionComponent = () => {
                 <TRsignupStack.Screen name={TRsignupScreens.TRsignup2} component={TRsignup2screen}/>
                 <TRsignupStack.Screen name={TRsignupScreens.TRcontraction} component={TRcontraction}/>
             </TRsignupStack.Navigator>
+    );
+}
+
+const LessonRequestMainStackNavigator: React.FunctionComponent = () => {
+    return (
+            <LessonRequestMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
+                <LessonRequestMainStack.Screen name={LessonRequestMainScreens.LessonRequest} component={LessonRequestScreen} options={{headerShown:true}}/>
+                
+            </LessonRequestMainStack.Navigator>
+    );
+}
+
+const LessonTodayMainStackNavigator: React.FunctionComponent = () => {
+    return (
+            <LessonTodayMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
+                <LessonTodayMainStack.Screen name={LessonTodayMainScreens.LessonToday} component={LessonTodayScreen} options={{headerShown:true}}/>
+                
+            </LessonTodayMainStack.Navigator>
+    );
+}
+
+const LessonConfirmMainStackNavigator: React.FunctionComponent = () => {
+    return (
+            <LessonConfirmMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
+                <LessonConfirmMainStack.Screen name={LessonConfirmMainScreens.LessonConfirm} component={LessonConfirmScreen} options={{headerShown:true}}/>
+                
+            </LessonConfirmMainStack.Navigator>
+    );
+}
+
+
+
+const OpenLessonMainStackNavigator: React.FunctionComponent = () => {
+    return (
+            <OpenLessonMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
+                <OpenLessonMainStack.Screen name={OpenLessonMainScreens.OpenLesson} component={OpenLessonScreen} options={{headerShown:true}}/>
+                <OpenLessonMainStack.Screen name={OpenLessonMainScreens.AdjustLessonTime} component={AdjustLessonTimeScreen} />
+            </OpenLessonMainStack.Navigator>
+    );
+}
+
+const AllMemberMainStackNavigator: React.FunctionComponent = () => {
+    return (
+            <AllMemberMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
+                <AllMemberMainStack.Screen name={AllMemberMainScreens.AllMember} component={AllMemberScreen} options={{headerShown:true}}/>
+                
+            </AllMemberMainStack.Navigator>
+    );
+}
+
+const ReregisterMainStackNavigator: React.FunctionComponent = () => {
+    return (
+            <ReregisterMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
+                <ReregisterMainStack.Screen name={ReregisterMemberMainScreens.ReregisterMember} component={ReregisterMemberScreen} options={{headerShown:true}}/>
+
+            </ReregisterMainStack.Navigator>
     );
 }
 

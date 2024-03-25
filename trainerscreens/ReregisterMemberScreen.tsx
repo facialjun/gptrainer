@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { View,Text, BackHandler, Dimensions } from 'react-native'
-import { TRMainScreens, TRMainStackParamList } from '../stacks/Navigator';
+import { ReregisterMemberMainStackParamList, ReregisterMemberMainScreens } from '../stacks/Navigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 
@@ -12,7 +12,7 @@ const screenHeight = Dimensions.get('screen').height;
 //////////////////////////////////////////////////////////////// 코드 타입정의
 
 type ReregisterMemberScreenNavigationProps = StackNavigationProp<
-    TRMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
+    ReregisterMemberMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
     'ReregisterMember' 
 >;
 
@@ -35,6 +35,7 @@ const ReregisterMemberScreen:React.FunctionComponent<ReregisterMemberScreenProps
 
             return () => backHandler.remove();
         }, [navigation]); // 의존성 배열에 navigation 추가
+
 
 
     return (

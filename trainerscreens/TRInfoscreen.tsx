@@ -85,15 +85,26 @@ const TRInfoscreen:React.FunctionComponent<TRInfoScreenProps> = ({navigation}) =
 };
 
 
-  return (
-    <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-          <TouchableOpacity
-              style={{marginTop:'5%',borderColor:'blue',borderWidth:1,width:screenWidth*0.5,height:screenHeight*0.04,justifyContent:'center',alignItems:'center'}}
-              onPress={handleSignOut}>
-                        <Text style={{color:'black'}}>로그아웃</Text>
-          </TouchableOpacity>
-    </View>
-  )
-}
+    return (
+        <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+            <View>
+                <Text>내 정보 보기</Text>
+            </View>
+            
+            <View>
+                <Text>정산관리</Text>
+            </View>
+
+            <View>
+                <Text>앱 정보</Text>
+            </View>
+            <TouchableOpacity
+                style={{marginTop:'5%',borderColor:'blue',borderWidth:1,width:screenWidth*0.5,height:screenHeight*0.04,justifyContent:'center',alignItems:'center'}}
+                onPress={handleSignOut}>
+                            <Text style={{color:'black'}}>로그아웃</Text>
+            </TouchableOpacity>
+        </View>
+    )
+    }
 
 export default TRInfoscreen

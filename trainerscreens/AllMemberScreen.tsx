@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { View,Text, BackHandler, Dimensions } from 'react-native'
-import { TRMainScreens, TRMainStackParamList } from '../stacks/Navigator';
+import { AllMemberMainStackParamList,  AllMemberMainScreens} from '../stacks/Navigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 
@@ -12,7 +12,7 @@ const screenHeight = Dimensions.get('screen').height;
 //////////////////////////////////////////////////////////////// 코드 타입정의
 
 type AllMemberScreenNavigationProps = StackNavigationProp<
-    TRMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
+    AllMemberMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
     'AllMember' 
 >;
 
@@ -36,6 +36,7 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
 
             return () => backHandler.remove();
         }, [navigation]); // 의존성 배열에 navigation 추가
+
 
 
     return (
