@@ -2,9 +2,9 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/Octicons';
 import Icon2 from 'react-native-vector-icons/AntDesign';
-import Icon3 from 'react-native-vector-icons/FontAwesome';
+import Icon3 from 'react-native-vector-icons/FontAwesome5';
 import Icon4 from 'react-native-vector-icons/Ionicons';
 import TRsignupscreen from '../trainerscreens/TRsignupscreen';
 import TRcontraction from '../trainerscreens/TRcontraction';
@@ -23,7 +23,6 @@ import LessonTodayScreen from '../trainerscreens/LessonTodayScreen';
 import LessonConfirmScreen from '../trainerscreens/LessonConfirmScreen';
 import AllMemberScreen from '../trainerscreens/AllMemberScreen';
 import ReregisterMemberScreen from '../trainerscreens/ReregisterMemberScreen';
-import OpenLessonScreen from '../trainerscreens/OpenLessonScreen';
 import AdjustLessonTimeScreen from '../trainerscreens/AdjustLessonTimeScreen';
 
 
@@ -72,7 +71,7 @@ type TRMainTabParamList= {
     TRhome: undefined;
     TRChat :undefined;
     TRInfo: undefined;
-    TRReservation: undefined;
+    LessonTodayMain: undefined;
 };
 
 
@@ -116,12 +115,10 @@ export type LessonConfirmMainStackParamList = {
 
 
 export enum OpenLessonMainScreens {
-    OpenLesson = 'OpenLesson',
     AdjustLessonTime ='AdjustLessonTime'
 };
 
 export type OpenLessonMainStackParamList = {
-    OpenLesson: undefined;
     AdjustLessonTime:undefined;
 };
 
@@ -190,16 +187,16 @@ function TRMainTabNavigator(): React.ReactElement {
                 }}
             />
             <TRMainTab.Screen
-                name={TRMainScreens.TRReservation}
-                component={TRReservationscreen}
+                name={TRMainScreens.LessonTodayMain}
+                component={LessonTodayMainStackNavigator}
                 options={{
                     headerShown: false,
-                    title:'수업',
-                    tabBarLabel: '수업',
+                    title:'오늘 수업',
+                    tabBarLabel: '오늘 수업',
                     tabBarIcon: ({ focused }) => (
                         focused
-                        ? <Icon4 name="calendar-number-sharp" size={26} color='black' />
-                        : <Icon3 name="calendar-o" size={23} color='black' />
+                        ? <Icon3 name="clipboard-list" size={24} color='black' />
+                        : <Icon name="list-ordered" size={23} color='black' />
                     )
                 }}
             />
@@ -250,13 +247,12 @@ const TRMainStackNavigator: React.FunctionComponent = () => {
             <TRMainStack.Screen name ={TRMainScreens.TRMain} component={TRMainTabNavigator}/>
             <TRMainStack.Screen name={TRMainScreens.TRhome} component={TRhomescreen} />
             <TRMainStack.Screen name={TRMainScreens.LessonRequestMain} component={LessonRequestMainStackNavigator} />
-            <TRMainStack.Screen name={TRMainScreens.LessonTodayMain} component={LessonTodayMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.LessonConfirmMain} component={LessonConfirmMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.AllMemberMain} component={AllMemberMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.ReregisterMemberMain} component={ReregisterMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.OpenLessonMain} component={OpenLessonMainStackNavigator} />
         </TRMainStack.Navigator>
-    </NavigationContainer>
+    </NavigationContainer> 
     );
 }
 
@@ -284,8 +280,7 @@ const LessonRequestMainStackNavigator: React.FunctionComponent = () => {
 const LessonTodayMainStackNavigator: React.FunctionComponent = () => {
     return (
             <LessonTodayMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
-                <LessonTodayMainStack.Screen name={LessonTodayMainScreens.LessonToday} component={LessonTodayScreen} options={{headerShown:true}}/>
-                
+                <LessonTodayMainStack.Screen name={LessonTodayMainScreens.LessonToday} component={LessonTodayScreen} options={{headerShown:false}}/>
             </LessonTodayMainStack.Navigator>
     );
 }
@@ -304,8 +299,7 @@ const LessonConfirmMainStackNavigator: React.FunctionComponent = () => {
 const OpenLessonMainStackNavigator: React.FunctionComponent = () => {
     return (
             <OpenLessonMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
-                <OpenLessonMainStack.Screen name={OpenLessonMainScreens.OpenLesson} component={OpenLessonScreen} options={{headerShown:true}}/>
-                <OpenLessonMainStack.Screen name={OpenLessonMainScreens.AdjustLessonTime} component={AdjustLessonTimeScreen} />
+                <OpenLessonMainStack.Screen name={OpenLessonMainScreens.AdjustLessonTime} component={AdjustLessonTimeScreen} options={{headerShown:true,title: '수업시간 설정하기'}}/>
             </OpenLessonMainStack.Navigator>
     );
 }

@@ -13,7 +13,7 @@ const screenHeight = Dimensions.get('screen').height;
 
 type LessonTodayScreenNavigationProps = StackNavigationProp<
     TRMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
-    'LessonToday' 
+    'LessonTodayMain' 
 >;
 
 interface LessonTodayScreenProps {
@@ -37,7 +37,9 @@ const LessonTodayScreen:React.FunctionComponent<LessonTodayScreenProps> = ({navi
         }, [navigation]); // 의존성 배열에 navigation 추가
         
     return (
-    <View><Text>LessonTodayScreen</Text></View>
+    <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+        <Text>LessonTodayScreen</Text>
+    </View>
     )
 }
 

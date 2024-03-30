@@ -44,9 +44,60 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
     
   return (
     <View style={{height:'100%',justifyContent:'center',alignItems:'center'}}>
-      <View style={{backgroundColor:'white',height:screenHeight*0.2,width:screenWidth*0.9,borderRadius:10}}>
+
+    <View style={{backgroundColor:'white',height:screenHeight*0.2,width:screenWidth*0.9,borderRadius:10}}>
+        <Text style={{fontSize:18,fontWeight:'bold'}}>회원관리</Text>
+        {/* <Text style={{fontSize:13,color:'gray',marginTop:'1%'}}>회원분들을 관리하고, 만족도를 높여보세요.</Text> */}
+        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+          <View style={{width:100,height:100}}>
+            <TouchableOpacity 
+            onPress={()=>{navigation.navigate(TRMainScreens.AllMemberMain)}}
+            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
+              <Text>
+                10
+              </Text>
+              
+              <Text>
+                전체회원
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{width:100,height:100}}>
+            <TouchableOpacity 
+            onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMemberMain)}}
+            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
+              <Text>
+                2
+              </Text>
+              
+              <Text>
+                신규요청
+              </Text>
+            </TouchableOpacity>
+          </View> 
+
+
+          <View style={{width:100,height:100}}>
+            <TouchableOpacity 
+            onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMemberMain)}}
+            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
+              <Text>
+                3
+              </Text>
+              
+              <Text>
+                종료임박
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+        </View>
+      </View>
+
+      <View style={{backgroundColor:'white',marginTop:'7%',height:screenHeight*0.2,width:screenWidth*0.9,borderRadius:10}}>
         <Text style={{fontSize:18,fontWeight:'bold'}}>수업관리</Text>
-        <Text style={{fontSize:13,color:'gray',marginTop:'1%'}}>요청을 확인하고 수업을 시작해보세요!</Text>
+        {/* <Text style={{fontSize:13,color:'gray',marginTop:'1%'}}>요청을 확인하고 수업을 시작해보세요!</Text> */}
       
         <View style={{flexDirection:'row',justifyContent:'space-between'}}>
           <View style={{width:100,height:100}}>
@@ -63,7 +114,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
             </TouchableOpacity>
           </View>
 
-          <View style={{width:100,height:100}}>
+          {/* <View style={{width:100,height:100}}>
             <TouchableOpacity 
             onPress={()=>{navigation.navigate(TRMainScreens.LessonTodayMain)}}
             style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
@@ -75,7 +126,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
                 오늘수업
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           <View style={{width:100,height:100}}>
             <TouchableOpacity 
@@ -94,56 +145,6 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
           
         </View>
 
-      </View>
-
-      <View style={{backgroundColor:'white',height:screenHeight*0.2,marginTop:'7%',width:screenWidth*0.9,borderRadius:10}}>
-        <Text style={{fontSize:18,fontWeight:'bold'}}>회원관리</Text>
-        <Text style={{fontSize:13,color:'gray',marginTop:'1%'}}>회원분들을 관리하고, 만족도를 높여보세요.</Text>
-        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-          <View style={{width:100,height:100}}>
-            <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.AllMemberMain)}}
-            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
-              <Text>
-                10
-              </Text>
-              
-              <Text>
-                전체회원
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* <View style={{width:100,height:100}}>
-            <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMemberMain)}}
-            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
-              <Text>
-                2
-              </Text>
-              
-              <Text>
-                신규요청
-              </Text>
-            </TouchableOpacity>
-          </View> */}
-
-
-          <View style={{width:100,height:100}}>
-            <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMemberMain)}}
-            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
-              <Text>
-                3
-              </Text>
-              
-              <Text>
-                종료임박
-              </Text>
-            </TouchableOpacity>
-          </View>
-          
-        </View>
       </View>
       
         <TouchableOpacity onPress={()=>{navigation.navigate(TRMainScreens.OpenLessonMain)}}>

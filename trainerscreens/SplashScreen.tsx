@@ -8,8 +8,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { TRMainScreens, TRMainStackParamList } from '../stacks/Navigator';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import config from '../config'
 import LottieView from 'lottie-react-native';
+import config from '../config'
 
 const BASE_URL = config.SERVER_URL;
 
