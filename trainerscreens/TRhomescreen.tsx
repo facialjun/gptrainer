@@ -114,7 +114,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
             </TouchableOpacity>
           </View>
 
-          {/* <View style={{width:100,height:100}}>
+          <View style={{width:100,height:100}}>
             <TouchableOpacity 
             onPress={()=>{navigation.navigate(TRMainScreens.LessonTodayMain)}}
             style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
@@ -126,7 +126,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
                 오늘수업
               </Text>
             </TouchableOpacity>
-          </View> */}
+          </View>
 
           <View style={{width:100,height:100}}>
             <TouchableOpacity 
@@ -154,10 +154,10 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
           </View>
         </TouchableOpacity>
 
-      <View style={{backgroundColor:'white',height:screenHeight*0.2,marginTop:'7%',width:screenWidth*0.9,borderRadius:10}}>
+      {/* <View style={{backgroundColor:'white',height:screenHeight*0.2,marginTop:'7%',width:screenWidth*0.9,borderRadius:10}}>
         <Text style={{fontSize:18,fontWeight:'bold'}}>프로필 공유</Text>
         <Text style={{fontSize:13,color:'gray',marginTop:'1%'}}>링크를 공유하고, 회원스케줄을 편하게 관리하세요!</Text>
-      </View>
+      </View> */}
     </View>
   )
 }

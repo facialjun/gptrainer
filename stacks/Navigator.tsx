@@ -24,6 +24,8 @@ import LessonConfirmScreen from '../trainerscreens/LessonConfirmScreen';
 import AllMemberScreen from '../trainerscreens/AllMemberScreen';
 import ReregisterMemberScreen from '../trainerscreens/ReregisterMemberScreen';
 import AdjustLessonTimeScreen from '../trainerscreens/AdjustLessonTimeScreen';
+import LogInformationSceen from '../trainerscreens/LogInformationSceen';
+import LessonRuleScreen from '../trainerscreens/LessonRuleScreen';
 
 
 
@@ -34,17 +36,18 @@ export enum TRMainScreens {
     ForgotPassword ='ForgotPassword',
     NewPassword ='NewPassword',
     TRMain ='TRMain',
-    TRhome = 'TRhome',
-    TRReservation= 'TRReservation',
-    TRChat= 'TRChat',
     TRInfo ='TRInfo',
+    TRhome = 'TRhome',
+    TRChat= 'TRChat',
+    TRInfoMain ='TRInfoMain',
     LessonRequestMain = 'LessonRequestMain',
     LessonTodayMain ='LessonTodayMain',
     LessonConfirmMain ='LessonConfirmMain',
     AllMemberMain ='AllMemberMain',
     ReregisterMemberMain='ReregisterMemberMain',
-    OpenLessonMain='OpenLessonMain'
-
+    OpenLessonMain='OpenLessonMain',
+    LogInformationMain='LogInformationMain',
+    LessonRuleMain='LessonRuleMain'
 };
 
 
@@ -55,16 +58,18 @@ export type TRMainStackParamList = {
     ForgotPassword: undefined;
     NewPassword: undefined;
     TRMain : undefined;
+    TRInfo :undefined;
     TRhome : undefined;
     TRChat : undefined;
-    TRReservation: undefined;
-    TRInfo: undefined;
+    TRInfoMain: undefined;
     LessonRequestMain:undefined;
     LessonTodayMain:undefined;
     LessonConfirmMain:undefined;
     AllMemberMain:undefined;
     ReregisterMemberMain:undefined;
     OpenLessonMain:undefined;
+    LogInformationMain:undefined;
+    LessonRuleMain:undefined;
 }
 
 type TRMainTabParamList= {
@@ -138,7 +143,21 @@ export type ReregisterMemberMainStackParamList = {
     ReregisterMember:undefined;
 };
 
+export enum LogInfoMainScreens {
+    LogInformation='LogInformation',
+};
 
+export type LogInfoMainStackParamList = {
+    LogInformation:undefined;
+};
+
+export enum LessonRuleMainScreens {
+    LessonRule='LessonRule',
+};
+
+export type LessonRuleMainStackParamList = {
+    LessonRule:undefined;
+};
 
 
 const TRMainStack = createNativeStackNavigator<TRMainStackParamList>();
@@ -150,7 +169,8 @@ const LessonConfirmMainStack = createNativeStackNavigator<LessonConfirmMainStack
 const OpenLessonMainStack = createNativeStackNavigator<OpenLessonMainStackParamList>();
 const AllMemberMainStack = createNativeStackNavigator<AllMemberMainStackParamList>();
 const ReregisterMainStack = createNativeStackNavigator<ReregisterMemberMainStackParamList>();
-
+const LogInfoMainStack = createNativeStackNavigator<LogInfoMainStackParamList>();
+const LessonRuleMainStack = createNativeStackNavigator<LessonRuleMainStackParamList>();
 
 
 
@@ -186,11 +206,11 @@ function TRMainTabNavigator(): React.ReactElement {
                     )
                 }}
             />
-            <TRMainTab.Screen
+            {/* <TRMainTab.Screen
                 name={TRMainScreens.LessonTodayMain}
                 component={LessonTodayMainStackNavigator}
                 options={{
-                    headerShown: false,
+                    headerShown: true,
                     title:'오늘 수업',
                     tabBarLabel: '오늘 수업',
                     tabBarIcon: ({ focused }) => (
@@ -199,9 +219,9 @@ function TRMainTabNavigator(): React.ReactElement {
                         : <Icon name="list-ordered" size={23} color='black' />
                     )
                 }}
-            />
+            /> */}
 
-            <TRMainTab.Screen
+            {/* <TRMainTab.Screen
                 name={TRMainScreens.TRChat}
                 component={TRChatscreen}
                 options={{
@@ -214,7 +234,7 @@ function TRMainTabNavigator(): React.ReactElement {
                         : <Icon4 name="chatbox-ellipses-outline" size={25} color='black' />
                     )
                 }}
-            />
+            /> */}
     
             
             <TRMainTab.Screen
@@ -222,8 +242,8 @@ function TRMainTabNavigator(): React.ReactElement {
                 component={TRInfoscreen}
                 options={{
                     headerShown: false,
-                    title:'내 정보',
-                    tabBarLabel: '내 정보',
+                    title:'프로필',
+                    tabBarLabel: '프로필',
                     tabBarIcon: ({ focused,color }) => (
                         focused
                         ? <Icon4 name="person" size={23} color='black' />
@@ -245,12 +265,14 @@ const TRMainStackNavigator: React.FunctionComponent = () => {
             <TRMainStack.Screen name={TRMainScreens.NewPassword} component={NewPasswordScreen}/>
             <TRMainStack.Screen name={TRMainScreens.TRsu} component={TRsignupStackNavigator}/>
             <TRMainStack.Screen name ={TRMainScreens.TRMain} component={TRMainTabNavigator}/>
-            <TRMainStack.Screen name={TRMainScreens.TRhome} component={TRhomescreen} />
+            <TRMainStack.Screen name={TRMainScreens.LessonTodayMain} component={LessonTodayMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.LessonRequestMain} component={LessonRequestMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.LessonConfirmMain} component={LessonConfirmMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.AllMemberMain} component={AllMemberMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.ReregisterMemberMain} component={ReregisterMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.OpenLessonMain} component={OpenLessonMainStackNavigator} />
+            <TRMainStack.Screen name={TRMainScreens.LogInformationMain} component={LogInfoMainStackNavigator} />
+            <TRMainStack.Screen name={TRMainScreens.LessonRuleMain} component={LessonRuleMainStackNavigator} />
         </TRMainStack.Navigator>
     </NavigationContainer> 
     );
@@ -272,7 +294,6 @@ const LessonRequestMainStackNavigator: React.FunctionComponent = () => {
     return (
             <LessonRequestMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
                 <LessonRequestMainStack.Screen name={LessonRequestMainScreens.LessonRequest} component={LessonRequestScreen} options={{headerShown:true}}/>
-                
             </LessonRequestMainStack.Navigator>
     );
 }
@@ -280,7 +301,7 @@ const LessonRequestMainStackNavigator: React.FunctionComponent = () => {
 const LessonTodayMainStackNavigator: React.FunctionComponent = () => {
     return (
             <LessonTodayMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
-                <LessonTodayMainStack.Screen name={LessonTodayMainScreens.LessonToday} component={LessonTodayScreen} options={{headerShown:false}}/>
+                <LessonTodayMainStack.Screen name={LessonTodayMainScreens.LessonToday} component={LessonTodayScreen} options={{headerShown:true}}/>
             </LessonTodayMainStack.Navigator>
     );
 }
@@ -319,6 +340,22 @@ const ReregisterMainStackNavigator: React.FunctionComponent = () => {
                 <ReregisterMainStack.Screen name={ReregisterMemberMainScreens.ReregisterMember} component={ReregisterMemberScreen} options={{headerShown:true}}/>
 
             </ReregisterMainStack.Navigator>
+    );
+}
+
+const LogInfoMainStackNavigator: React.FunctionComponent = () => {
+    return (
+            <LogInfoMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
+                <LogInfoMainStack.Screen name={LogInfoMainScreens.LogInformation} component={LogInformationSceen} options={{headerShown:true,title: '내 정보'}}/>
+            </LogInfoMainStack.Navigator>
+    );
+}
+
+const LessonRuleMainStackNavigator: React.FunctionComponent = () => {
+    return (
+            <LessonRuleMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
+                <LessonRuleMainStack.Screen name={LessonRuleMainScreens.LessonRule} component={LessonRuleScreen} options={{headerShown:true,title: '내 정보'}}/>
+            </LessonRuleMainStack.Navigator>
     );
 }
 

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { View,Text, Dimensions, BackHandler } from 'react-native'
+import { View,Text, Dimensions, BackHandler, TouchableOpacity,ScrollView } from 'react-native'
 import { TRMainScreens, TRMainStackParamList } from '../stacks/Navigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -37,9 +37,30 @@ const LessonTodayScreen:React.FunctionComponent<LessonTodayScreenProps> = ({navi
         }, [navigation]); // 의존성 배열에 navigation 추가
         
     return (
-    <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-        <Text>LessonTodayScreen</Text>
-    </View>
+        <ScrollView style={{height:'auto'}}>
+            
+                <View style={{justifyContent:'center',alignItems:'center'}}>
+                    <TouchableOpacity 
+                    style={{width:screenWidth*0.9,justifyContent:'flex-start',alignItems:'flex-start',height:screenHeight*0.2,backgroundColor:'white',marginTop:'3%',borderRadius:8,borderWidth:1,borderColor:'#4A7AFF'}}>
+                        <Text>xx회원(잔여회차)</Text>
+                        <Text>방번호</Text>
+                        <Text>날짜 시간</Text>
+                        
+            
+                            <View style={{flexDirection:'row',backgroundColor:'gray',width:screenWidth*0.8,justifyContent:'space-between',alignItems:'center',height:screenHeight*0.1}}>
+                                <Text>수업확정</Text>
+                                <Text>시간변경</Text>
+                                <Text>노쇼</Text>
+                                <Text>수업완료</Text>
+                            </View>
+                
+
+                        
+                    </TouchableOpacity>
+                </View>
+            
+        </ScrollView>
+    
     )
 }
 
