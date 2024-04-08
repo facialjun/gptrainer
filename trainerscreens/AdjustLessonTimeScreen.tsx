@@ -1,24 +1,19 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react'
-import { View,Text, BackHandler, Dimensions, TouchableOpacity, Platform,ScrollView  } from 'react-native'
-import { OpenLessonMainStackParamList } from '../stacks/Navigator';
+import { View,Text, BackHandler, Dimensions, TouchableOpacity, Platform,ScrollView,Alert  } from 'react-native'
+import { OpenLessonMainStackParamList, TRMainScreens } from '../stacks/Navigator';
+import Icon from 'react-native-vector-icons/AntDesign'; 
+import { adjustLessonTimes } from '../lessonTime/AdjustLessonTime'
+import { diffWeekLessonTimes } from '../lessonTime/WeekendTime';
+import TimePicker from '../timePicker/TimePicker';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
-const shadowStyle = Platform.select({
-    ios: {
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-    },
-    android: {
-        elevation: 3,
-    },
-});
 
 
 
@@ -38,202 +33,411 @@ type FilterType = '매일 같아요' | '요일별로 달라요' | '평일/주말
 
 
 
+
+
 const AdjustLessonTimeScreen:React.FunctionComponent<AdjustLessonTimeScreenProps> = ({navigation}) => {
 
     const [filter, setFilter] = useState<FilterType>('매일 같아요'); // 필터 상태
+    const [allDayLessonTimes, setAllDayLessonTimes] = useState([]);
+    const { lessonTimes, addLessonTime, removeLessonTime, setLessonTimes } = adjustLessonTimes();
+    const { weekendLessonTimes, addWeekendLessonTime, removeWeekendLessonTime, setWeekendLessonTimes } = diffWeekLessonTimes();
+    const diffWeekDays = ['평일','주말'];
+    const [selectedStartTime, setSelectedStartTime] = useState('00:00');
+    const [selectedEndTime, setSelectedEndTime] = useState('00:00');
+    const [startTimePickerVisible, setStartTimePickerVisible] = useState(false);
+    const [endTimePickerVisible, setEndTimePickerVisible] = useState(false);
+    const [editingTimeSlotId, setEditingTimeSlotId] = useState(null); // 편집 중인 시간 슬롯 ID
+    const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
+    const [currentEditing, setCurrentEditing] = useState({ day: '', id: null, type: '' });
+    // const [currentDay, setCurrentDay] = useState('');
+    // const [timePickerType, setTimePickerType] = useState('');
+    // const days = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
 
-    // 필터에 따른 뷰 렌더링
+
+
+
+
+// 매일 같아요 시 시작 시간 설정 함수
+const handleSetStartTime = async (time, id) => {
+    setStartTimePickerVisible(false); // TimePicker 숨기기
+    await AsyncStorage.setItem('selectedStartTime', time);
+    const updatedTimes = allDayLessonTimes.map(item => {
+        if (item.id === id) {
+            return { ...item, startTime: time };
+        }
+        return item;
+    });
+    console.log(updatedTimes);
+    setAllDayLessonTimes(updatedTimes);
+};
+
+// 종료 시간 설정 함수
+const handleSetEndTime = async (time, id) => {
+    setEndTimePickerVisible(false); // TimePicker 숨기기
+    await AsyncStorage.setItem('selectedEndTime', time);
+    const updatedTimes = allDayLessonTimes.map(item => {
+        if (item.id === id) {
+            return { ...item, endTime: time };
+        }
+        return item;
+    });
+    console.log(updatedTimes);
+    setAllDayLessonTimes(updatedTimes);
+};
+    
+
+    const allDayAddLessonTime = () => {
+        // 간단한 예시를 위해 현재 시간을 startTime으로 사용
+        const allDayNewTime = {
+            id: new Date().getTime(), // 고유 ID 생성
+            startTime: selectedStartTime, // 예시 시간
+            endTime: selectedEndTime, // 예시 시간
+        };
+        setAllDayLessonTimes([...allDayLessonTimes, allDayNewTime]);
+    };
+
+    const allDayRemoveLessonTime = (id) => {
+        setAllDayLessonTimes(allDayLessonTimes.filter(item => item.id !== id));
+    };
+        
+
+    const addAllDayLessonTimeToDB = async () => {
+    // 시간 슬롯 데이터 준비
+    const timeSlots = allDayLessonTimes.map(slot => ({
+        day_of_week: 'All', // 또는 다른 요일을 지정
+        start_time: slot.startTime,
+        end_time: slot.endTime
+    }));
+
+    try {
+        // Axios 라이브러리를 사용하여 서버에 POST 요청
+        const response = await axios.post('http://192.168.1.118:8080/allDayAvailable-times', {
+            timeSlots: timeSlots
+        });
+
+        console.log('Data saved:', response.data);
+        // 성공 메시지를 사용자에게 알리고 확인을 누르면 홈 화면으로 이동
+        Alert.alert(
+            '수업개설 완료',
+            '수업이 개설되었습니다!',
+            [
+                {
+                    text: '확인',
+                    onPress: () => {
+                        navigation.navigate(TRMainScreens.TRMain)
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
+    } catch (error) {
+        console.error('Error adding time slots:', error);
+    }
+};
+
+
+    ////////요일별
+
+    const handleAddLessonTime = (day) => {
+            // 여기서는 예시로 '00:00'을 기본 값으로 사용합니다.
+            addLessonTime(day, '00:00', '00:00');
+        };
+    
+    // // 시작 시간 또는 종료 시간 편집을 위한 함수
+    const editTimeSlot = (day, id, type) => {
+        setCurrentEditing({ day, id, type });
+        setIsTimePickerVisible(true);
+    };
+
+    // TimePicker에서 시간 선택 후 콜백
+        const handleTimeSelected = (selectedTime) => {
+            const { day, id, type } = currentEditing;
+            const updatedLessonTimes = { ...lessonTimes };
+            const updatedTimeSlots = updatedLessonTimes[day].map(slot => {
+            if (slot.id === id) {
+                return { ...slot, [type]: selectedTime };
+            }
+            return slot;
+            });
+
+            setLessonTimes({ ...updatedLessonTimes, [day]: updatedTimeSlots });
+            setIsTimePickerVisible(false);
+        };
+
+
+    const weeklyChangeableToDB = async () => {
+        const timeSlots = Object.keys(lessonTimes).flatMap(day =>
+            lessonTimes[day].map(slot => ({ day_of_week: day, start_time: slot.startTime, end_time: slot.endTime }))
+        );
+
+        try {
+            const response = await axios.post('http://192.168.1.118:8080/weeklyChangeable-times', { timeSlots });
+            console.log('Data saved:', response.data);
+            // 성공 메시지를 사용자에게 알리고 확인을 누르면 홈 화면으로 이동
+            Alert.alert(
+                '수업개설 완료',
+                '수업이 개설되었습니다!',
+                [
+                    {
+                        text: '확인',
+                        onPress: () => {
+                            navigation.navigate(TRMainScreens.TRMain)
+                        }
+                    }
+                ],
+                { cancelable: false }
+            );
+        } catch (error) {
+            console.error('Error submitting lesson times:', error);
+        }
+    };
+    
+
+        ////////평일,주말
+
+        const handleWeekendTimeSelected = (selectedTime) => {
+            const { day, id, type } = currentEditing;
+            const updatedWeekendLessonTimes = { ...weekendLessonTimes };
+            const updatedTimeSlots = updatedWeekendLessonTimes[day].map(slot => {
+                if (slot.id === id) {
+                    return { ...slot, [type]: selectedTime };
+                }
+                return slot;
+            });
+
+            setWeekendLessonTimes({ ...updatedWeekendLessonTimes, [day]: updatedTimeSlots });
+            setIsTimePickerVisible(false);
+        };
+
+
+
+        const diffWeekendToDB = async () => {
+            const timeSlots = Object.keys(weekendLessonTimes).flatMap(day =>
+                weekendLessonTimes[day].map(slot => ({ day_of_week: day, start_time: slot.startTime, end_time: slot.endTime }))
+            );
+
+        try {
+            const response = await axios.post('http://192.168.1.118:8080/diffWeekend-times', { timeSlots });
+            console.log('Data saved:', response.data);
+            // 성공 메시지를 사용자에게 알리고 확인을 누르면 홈 화면으로 이동
+            Alert.alert(
+                '수업개설 완료',
+                '수업이 개설되었습니다!',
+                [
+                    {
+                        text: '확인',
+                        onPress: () => {
+                            navigation.navigate(TRMainScreens.TRMain)
+                        }
+                    }
+                ],
+                { cancelable: false }
+            );
+        } catch (error) {
+            console.error('Error submitting lesson times:', error);
+        }
+    };
+
+
+    
+
+
+    // 필터에 따른 뷰 렌더링r
         const renderFilterView = () => {
             switch (filter) {
             case '매일 같아요':
                 return (
-                    <View style={{backgroundColor:'white',height:screenHeight*0.65,justifyContent:'flex-start'}}>
-                        <View style={{width:screenWidth*0.9,height:screenHeight*0.2,borderRadius:8,borderWidth:1,borderColor:'white',...shadowStyle,backgroundColor:'white'}}>
-                        <View style={{height:screenHeight*0.08,justifyContent:'center'}}>
-                            <Text style={{fontSize:20,fontWeight:'600',marginLeft:'5%'}}>수업 가능시간</Text>
-                        </View>
-
-                        <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>매일</Text>
-                            <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                <TouchableOpacity 
-                                style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                    <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                    <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
+                    <View style={{ backgroundColor: 'white', height: screenHeight * 0.75 }}>
+                        <ScrollView style={{ flex: 1}}>
+                            <View 
+                            style={{ 
+                                width: screenWidth * 0.9, 
+                                alignSelf: 'center',
+                                borderRadius: 8, 
+                                borderWidth: 1, 
+                                borderColor: '#4A7AFF', 
+                                backgroundColor: 'white', 
+                                marginBottom: 20,
+                                paddingBottom: 20,
+                                borderBottomWidth: 1,
+                                borderBottomColor: 'lightgray',
+                            }}
+                            >
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 ,marginTop:'3%'}}>
+                                <Text style={{ fontSize: 22, fontWeight: '600'}}>매일</Text>
+                                <TouchableOpacity onPress={allDayAddLessonTime}>
+                                    <Icon name="pluscircle" size={22} color='#4A7AFF'/>
                                 </TouchableOpacity>
                             </View>
 
-                        </View>
-                    </View>
+                            {allDayLessonTimes.map((item, index) => (
+                                <View key={item.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                                    <TouchableOpacity onPress={() => { setStartTimePickerVisible(true); setEditingTimeSlotId(item.id); }}>
+                                        <Text>시작: {item.startTime}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => { setEndTimePickerVisible(true); setEditingTimeSlotId(item.id); }}>
+                                        <Text>종료: {item.endTime}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => allDayRemoveLessonTime(item.id)}>
+                                        <Icon name="closecircle" size={18} color="red" />
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
+                            <TimePicker 
+                                isVisible={startTimePickerVisible}
+                                onClose={() => setStartTimePickerVisible(false)}
+                                onConfirm={(time) => handleSetStartTime(time, editingTimeSlotId)}
+                            />
+                            <TimePicker 
+                                isVisible={endTimePickerVisible}
+                                onClose={() => setEndTimePickerVisible(false)}
+                                onConfirm={(time) => handleSetEndTime(time, editingTimeSlotId)}
+                            />
+                            </View>
+                            
+                        </ScrollView>
 
+                            <View style={{backgroundColor:'white',width:screenWidth,alignItems:'center',height:screenHeight*0.1,justifyContent:'center'}}>
+                                <TouchableOpacity
+                                onPress={addAllDayLessonTimeToDB }
+                                style={{width:screenWidth*0.9,backgroundColor:'#4A7AFF',justifyContent:'center',alignItems:'center',height:screenHeight*0.055,borderRadius:8}}>
+                                    <Text style={{color:'white',fontSize:17,fontWeight:'600'}}>적용하기</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                        
                     </View>
                     
+
                 )
 
             case '요일별로 달라요':
                 return (
-                    <View style={{backgroundColor:'white',height:screenHeight*0.65}}>
-                        <View style={{width:screenWidth*0.9,height:screenHeight*0.58,borderRadius:8,borderWidth:1,borderColor:'white',...shadowStyle,backgroundColor:'white'}}>
-                            <View style={{height:screenHeight*0.08,justifyContent:'center'}}>
-                                <Text style={{fontSize:20,fontWeight:'600',marginLeft:'5%'}}>수업 가능시간</Text>
+
+                    <View style={{height:'auto',justifyContent:'center',alignItems:'center'}}>
+                        <ScrollView style={{ height:'auto',marginTop:'5%' }}>
+                        {Object.keys(lessonTimes).map((day) => (
+                            <View key={day} style={{ 
+                                    width: screenWidth*0.9, 
+                                    borderRadius: 8, 
+                                    borderWidth: 1, 
+                                    borderColor: '#4A7AFF', 
+                                    backgroundColor: 'white', 
+                                    marginBottom: 20,
+                                    borderBottomWidth: 1, // 요일 간 구분선을 위한 하단 테두리 너비 설정
+                                    borderBottomColor: 'lightgray', // 하단 테두리 색상 설정
+                                    }}>
+                            
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                                    <Text style={{ fontSize: 15, fontWeight:'600' }}>{day}</Text>
+
+                                    <TouchableOpacity onPress={() => handleAddLessonTime(day)}>
+                                        <Icon name="pluscircle" size={20} color="#4A7AFF" />
+                                    </TouchableOpacity>
+
                             </View>
-                            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ alignItems: 'center' }}>
 
-                            <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>월</Text>
-                                <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                    <TouchableOpacity 
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
-                                    </TouchableOpacity>
+                            {lessonTimes[day].map((timeSlot) => (
+                                <View key={timeSlot.id} style={{ 
+                                        flexDirection: 'row', 
+                                        justifyContent: 'space-between', 
+                                        alignItems: 'center', 
+                                        padding: 20 
+                                        }}>
+                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'startTime')}>
+                                    <Text>시작: {timeSlot.startTime}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endTime')}>
+                                    <Text>종료: {timeSlot.endTime}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => removeLessonTime(day, timeSlot.id)}>
+                                    <Icon name="closecircle" size={20} color="red" />
+                                </TouchableOpacity>
                                 </View>
+                            ))}
                             </View>
-
-                            <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>화</Text>
-                                <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                    <TouchableOpacity 
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>수</Text>
-                                <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                    <TouchableOpacity 
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>목</Text>
-                                <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                    <TouchableOpacity 
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>금</Text>
-                                <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                    <TouchableOpacity 
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>토</Text>
-                                <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                    <TouchableOpacity 
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>일</Text>
-                                <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                    <TouchableOpacity 
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            </ScrollView>
+                        ))}
+                        {isTimePickerVisible && (
+                            <TimePicker
+                            isVisible={isTimePickerVisible}
+                            onClose={() => setIsTimePickerVisible(false)}
+                            onConfirm={handleTimeSelected}
+                            />
+                        )}
                         
-                    </View>
+                        </ScrollView>
 
+                        <View style={{backgroundColor:'white',width:screenWidth,alignItems:'center',height:screenHeight*0.25,justifyContent:'center'}}>
+                            <TouchableOpacity
+                            onPress={weeklyChangeableToDB}
+                            style={{width:screenWidth*0.9,backgroundColor:'#4A7AFF',justifyContent:'center',alignItems:'center',height:screenHeight*0.055,borderRadius:8}}>
+                                <Text style={{color:'white',fontSize:17,fontWeight:'600'}}>적용하기</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
+                    
+
+
                 )
 
                 
             case '평일/주말 달라요':
                     return (
-                        <View style={{backgroundColor:'white',height:screenHeight*0.65}}>
-                        <View style={{width:screenWidth*0.9,height:screenHeight*0.3,borderRadius:8,borderWidth:1,borderColor:'white',...shadowStyle,backgroundColor:'white'}}>
-                            <View style={{height:screenHeight*0.08,justifyContent:'center'}}>
-                                <Text style={{fontSize:20,fontWeight:'600',marginLeft:'5%'}}>수업 가능시간</Text>
-                            </View>
+                       <View style={{ backgroundColor: 'white', height: screenHeight * 0.75 }}>
+                            <ScrollView style={{ flex: 1 }}>
+                                {diffWeekDays.map((day) => (
+                                    <View key={day} style={{ 
+                                            width: screenWidth * 0.9, 
+                                            alignSelf: 'center', 
+                                            borderRadius: 8, 
+                                            borderWidth: 1, 
+                                            borderColor: '#4A7AFF', 
+                                            backgroundColor: 'white', 
+                                            marginBottom: 20, 
+                                            paddingBottom: 20, 
+                                            borderBottomWidth: 1, 
+                                            borderBottomColor: 'lightgray' }}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20,marginTop:'4%' }}>
+                                            
+                                                <Text style={{ fontSize: 22, fontWeight: '600' }}>{day}</Text>
+                                                <TouchableOpacity onPress={() => addWeekendLessonTime(day, '00:00', '00:00')}>
+                                                    <Icon name="pluscircle" size={20} color="#4A7AFF" />
+                                                </TouchableOpacity>
+                                        
+                                        </View>
+                                        {weekendLessonTimes[day].map((timeSlot) => (
+                                            <View key={timeSlot.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'startTime')}>
+                                                    <Text>시작: {timeSlot.startTime}</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endTime')}>
+                                                    <Text>종료: {timeSlot.endTime}</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity onPress={() => removeWeekendLessonTime(day, timeSlot.id)}>
+                                                    <Icon name="closecircle" size={20} color="red" />
+                                                </TouchableOpacity>
+                                            </View>
+                                        ))}
+                                    </View>
+                                ))}
+                            </ScrollView>
+                                {isTimePickerVisible && (
+                                <TimePicker
+                                    isVisible={isTimePickerVisible}
+                                    onClose={() => setIsTimePickerVisible(false)}
+                                    onConfirm={handleWeekendTimeSelected}
+                                />
+                            )}
 
-                            <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>평일(월~금)</Text>
-                                <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                    <TouchableOpacity 
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            <View style={{height:screenHeight*0.1,justifyContent:'flex-start',alignItems:'center'}}>
-                                <Text style={{fontSize:15,marginLeft:'5%'}}>주말</Text>
-                                <View style={{flexDirection:'row',width:screenWidth*0.8,backgroundColor:'white',justifyContent:'space-between',paddingHorizontal:20,borderWidth:1,borderColor:'#4A7AFF',borderRadius:8,height:screenHeight*0.05}}>
-                                    <TouchableOpacity 
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>시작: 00:00</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                    style={{justifyContent:'center',width:screenWidth*0.3,alignItems:'center'}}>
-                                        <Text style={{fontWeight:'400'}}>종료: 00:00</Text>
-                                    </TouchableOpacity>
-                                </View>
+                            <View style={{backgroundColor:'white',width:screenWidth,alignItems:'center',height:screenHeight*0.1,justifyContent:'center'}}>
+                                <TouchableOpacity
+                                onPress={diffWeekendToDB}
+                                style={{width:screenWidth*0.9,backgroundColor:'#4A7AFF',justifyContent:'center',alignItems:'center',height:screenHeight*0.055,borderRadius:8}}>
+                                    <Text style={{color:'white',fontSize:17,fontWeight:'600'}}>적용하기</Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
-                        </View>
+
                     )
                     
             }
@@ -290,12 +494,7 @@ const AdjustLessonTimeScreen:React.FunctionComponent<AdjustLessonTimeScreenProps
             {renderFilterView()}
 
 
-        <View style={{backgroundColor:'white',width:screenWidth,alignItems:'center',height:screenHeight*0.1,justifyContent:'center'}}>
-            <TouchableOpacity
-            style={{width:screenWidth*0.9,backgroundColor:'#4A7AFF',justifyContent:'center',alignItems:'center',height:screenHeight*0.05,borderRadius:8}}>
-                <Text style={{color:'white',fontSize:15,fontWeight:'600'}}>적용하기</Text>
-            </TouchableOpacity>
-        </View>
+        
 
         </View>
     )

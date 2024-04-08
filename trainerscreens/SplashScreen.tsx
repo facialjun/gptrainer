@@ -1,6 +1,6 @@
 import { fetchAuthSession } from '@aws-amplify/auth';
 import React, { useEffect, useState } from 'react'
-import { View,Text,StyleSheet,Image, Dimensions} from 'react-native'
+import { View,Text,StyleSheet,Image, Dimensions, BackHandler, Alert, Platform, Linking} from 'react-native'
 import { Amplify, type ResourcesConfig } from 'aws-amplify';
 import { defaultStorage } from 'aws-amplify/utils';
 import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
@@ -10,6 +10,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LottieView from 'lottie-react-native';
 import config from '../config'
+import getAppVersion from '../version';
 
 const BASE_URL = config.SERVER_URL;
 
@@ -43,9 +44,71 @@ const authConfig: ResourcesConfig['Auth'] = {
 
 const SplashScreen:React.FunctionComponent<SplashScreenProps> = ({navigation}) => {
 
+    useEffect(() => {
+    console.log("현재 앱 버전:", getAppVersion());
+
+    const backAction = () => true; // 이 함수가 true를 반환하면 기본 동작을 수행하지 않음
+
+    // 앱 버전 확인 및 업데이트 확인
+    const checkForUpdates = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/version`, {
+            headers: { 'App-Version': getAppVersion() },
+            });
+            const { updateRequired, latestVersion, isMandatory, description } = response.data;
+            console.log(response.data);
+
+            if (getAppVersion() < latestVersion) {
+            const handleUpdate = () => {
+                const storeUrl = Platform.select({
+                ios: `itms-apps://apps.apple.com/app/id6478826277`,
+                android: `market://details?id=com.seung980428.GP`,
+                });
+                Linking.openURL(storeUrl).catch(err => console.error('An error occurred', err));
+            };
+
+            const alertOptions = [
+                {
+                text: '업데이트',
+                onPress: () => {
+                    handleUpdate();
+                },
+                },
+            ];
+
+            if (updateRequired === 0) {
+                alertOptions.push({ text: '나중에', onPress: () => handleAutoSignIn() });
+            }
+
+            Alert.alert(
+                '새로운 업데이트가 있습니다',
+                `${description}` ,
+                alertOptions,
+                { cancelable: false },
+            );
+            } else {
+            handleAutoSignIn();
+            }
+        } catch (error) {
+            console.error('업데이트 확인 실패:', error);
+            handleAutoSignIn();
+        }
+        };
+
+
+    checkForUpdates();
+
+    return () => {
+        // 컴포넌트가 언마운트될 때 BackHandler 이벤트 리스너 제거
+        BackHandler.removeEventListener('hardwareBackPress', backAction);
+    };
+}, []);
+
+
+
     useEffect(()=>{
         console.log(BASE_URL);
-    })
+    });
 
     const handleAutoSignIn = async () => {
 
@@ -111,9 +174,6 @@ const SplashScreen:React.FunctionComponent<SplashScreenProps> = ({navigation}) =
     }
     };
 
-useEffect(() => {
-    handleAutoSignIn(); // Check current session and attempt auto sign-in
-}, []);
 
     return (
     <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'white'}}>
