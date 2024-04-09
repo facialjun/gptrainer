@@ -8,6 +8,9 @@ import { diffWeekLessonTimes } from '../lessonTime/WeekendTime';
 import TimePicker from '../timePicker/TimePicker';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../config'
+
+const BASE_URL = config.SERVER_URL;
 
 
 
@@ -49,12 +52,36 @@ const AdjustLessonTimeScreen:React.FunctionComponent<AdjustLessonTimeScreenProps
     const [editingTimeSlotId, setEditingTimeSlotId] = useState(null); // 편집 중인 시간 슬롯 ID
     const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
     const [currentEditing, setCurrentEditing] = useState({ day: '', id: null, type: '' });
-    // const [currentDay, setCurrentDay] = useState('');
-    // const [timePickerType, setTimePickerType] = useState('');
-    // const days = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+    const [userData, setUserData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
+useEffect(() => {
+    const fetchData = async () => {
+        setIsLoading(true);
+        try {
+            // AsyncStorage에서 logId 가져오기
+            let logId = await AsyncStorage.getItem('logId');
+            console.log(logId)
+            if (logId) {
+                logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
 
+                // logId를 사용하여 사용자 데이터 가져오기
+                const response = await axios.get(`${BASE_URL}/Tuser/${logId}`);
+                if (response.status === 200) {
+                    setUserData(response.data);
+                    console.log('Fetched User Data:', response.data);
 
+                }
+            }
+        } catch (error) {
+            console.log('Error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    fetchData();
+}, []);
 
 
 // 매일 같아요 시 시작 시간 설정 함수
@@ -101,39 +128,46 @@ const handleSetEndTime = async (time, id) => {
     };
         
 
-    const addAllDayLessonTimeToDB = async () => {
-    // 시간 슬롯 데이터 준비
-    const timeSlots = allDayLessonTimes.map(slot => ({
-        day_of_week: 'All', // 또는 다른 요일을 지정
-        start_time: slot.startTime,
-        end_time: slot.endTime
-    }));
+const addAllDayLessonTimeToDB = async () => {
+    // AsyncStorage에서 logId 직접 가져오기
+    let logId = await AsyncStorage.getItem('logId');
+    if (logId) {
+        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
 
-    try {
-        // Axios 라이브러리를 사용하여 서버에 POST 요청
-        const response = await axios.post('http://192.168.1.118:8080/allDayAvailable-times', {
-            timeSlots: timeSlots
-        });
+        const timeSlots = allDayLessonTimes.map(slot => ({
+            day_of_week: 'All', // 또는 다른 요일을 지정
+            start_time: slot.startTime,
+            end_time: slot.endTime
+        }));
+        console.log(logId);
 
-        console.log('Data saved:', response.data);
-        // 성공 메시지를 사용자에게 알리고 확인을 누르면 홈 화면으로 이동
-        Alert.alert(
-            '수업개설 완료',
-            '수업이 개설되었습니다!',
-            [
-                {
-                    text: '확인',
-                    onPress: () => {
-                        navigation.navigate(TRMainScreens.TRMain)
+        try {
+            // Axios 라이브러리를 사용하여 서버에 POST 요청, 여기에 logId를 포함하여 전송
+            const response = await axios.post(`${BASE_URL}/allDayAvailable-times`, {
+                logId, // logId를 POST 요청 본문에 포함
+                timeSlots: timeSlots
+            });
+
+            console.log('Data saved:', response.data);
+            Alert.alert(
+                '수업개설 완료',
+                '수업이 개설되었습니다!',
+                [
+                    {
+                        text: '확인',
+                        onPress: () => navigation.navigate(TRMainScreens.TRMain)
                     }
-                }
-            ],
-            { cancelable: false }
-        );
-    } catch (error) {
-        console.error('Error adding time slots:', error);
+                ],
+                { cancelable: false }
+            );
+        } catch (error) {
+            console.error('Error adding time slots:', error);
+        }
+    } else {
+        console.error('No logId found in AsyncStorage.');
     }
 };
+
 
 
     ////////요일별
@@ -166,31 +200,35 @@ const handleSetEndTime = async (time, id) => {
 
 
     const weeklyChangeableToDB = async () => {
+    let logId = await AsyncStorage.getItem('logId');
+    if (logId) {
+        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
+
         const timeSlots = Object.keys(lessonTimes).flatMap(day =>
             lessonTimes[day].map(slot => ({ day_of_week: day, start_time: slot.startTime, end_time: slot.endTime }))
         );
 
         try {
-            const response = await axios.post('http://192.168.1.118:8080/weeklyChangeable-times', { timeSlots });
+            const response = await axios.post(`${BASE_URL}/weeklyChangeable-times`, {
+                logId,
+                timeSlots
+            });
             console.log('Data saved:', response.data);
-            // 성공 메시지를 사용자에게 알리고 확인을 누르면 홈 화면으로 이동
             Alert.alert(
                 '수업개설 완료',
                 '수업이 개설되었습니다!',
                 [
-                    {
-                        text: '확인',
-                        onPress: () => {
-                            navigation.navigate(TRMainScreens.TRMain)
-                        }
-                    }
+                    { text: '확인', onPress: () => navigation.navigate(TRMainScreens.TRMain) }
                 ],
                 { cancelable: false }
             );
         } catch (error) {
             console.error('Error submitting lesson times:', error);
         }
-    };
+    } else {
+        console.error('No logId found in AsyncStorage.');
+    }
+};
     
 
         ////////평일,주말
@@ -212,31 +250,38 @@ const handleSetEndTime = async (time, id) => {
 
 
         const diffWeekendToDB = async () => {
-            const timeSlots = Object.keys(weekendLessonTimes).flatMap(day =>
-                weekendLessonTimes[day].map(slot => ({ day_of_week: day, start_time: slot.startTime, end_time: slot.endTime }))
-            );
+    let logId = await AsyncStorage.getItem('logId');
+    if (logId) {
+        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
+
+        const timeSlots = Object.keys(weekendLessonTimes).flatMap(day =>
+            weekendLessonTimes[day].map(slot => ({ day_of_week: day, start_time: slot.startTime, end_time: slot.endTime }))
+        );
 
         try {
-            const response = await axios.post('http://192.168.1.118:8080/diffWeekend-times', { timeSlots });
+            const response = await axios.post(`${BASE_URL}/diffWeekend-times`, {
+                logId,
+                timeSlots
+            });
             console.log('Data saved:', response.data);
-            // 성공 메시지를 사용자에게 알리고 확인을 누르면 홈 화면으로 이동
             Alert.alert(
                 '수업개설 완료',
                 '수업이 개설되었습니다!',
                 [
-                    {
-                        text: '확인',
-                        onPress: () => {
-                            navigation.navigate(TRMainScreens.TRMain)
-                        }
-                    }
+                    { text: '확인', onPress: () => navigation.navigate(TRMainScreens.TRMain) }
                 ],
                 { cancelable: false }
             );
         } catch (error) {
             console.error('Error submitting lesson times:', error);
         }
-    };
+    } else {
+        console.error('No logId found in AsyncStorage.');
+    }
+};
+
+
+
 
 
     

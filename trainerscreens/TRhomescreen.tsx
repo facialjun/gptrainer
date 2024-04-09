@@ -1,7 +1,12 @@
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View,Text, BackHandler, Dimensions, TouchableOpacity } from 'react-native'
 import { TRMainScreens, TRMainStackParamList } from '../stacks/Navigator';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../config'
+
+const BASE_URL = config.SERVER_URL;
 
 
 const screenWidth = Dimensions.get('screen').width;
@@ -24,6 +29,49 @@ interface TRhomeScreenProps {
 //////////////////////////////////////////////////////////////// 
 
 const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) => {
+
+    const [userData, setUserData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [buttonText, setButtonText] = useState('');
+    const [lessonDescription, setLessonDescription] = useState('');
+    
+
+
+    useEffect(() => {
+    const fetchAvailableTimes = async () => {
+        try {
+            // AsyncStorage에서 logId 가져오기
+            let logId = await AsyncStorage.getItem('logId');
+            if (logId) {
+                logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
+
+                // logId를 사용하여 사용자의 uid를 가져오는 요청
+                const userResponse = await axios.get(`${BASE_URL}/Tuser/${logId}`);
+                if (userResponse.status === 200) {
+                    const uid = userResponse.data.uid;
+
+                    // uid를 사용하여 사용자의 available_times 정보를 가져오는 요청
+                    const timesResponse = await axios.get(`${BASE_URL}/userAvailableTimes/${uid}`);
+                    if (timesResponse.data.hasAvailableTimes) {
+                      
+                        // 여기에서 UI 업데이트 로직을 추가
+                        setButtonText("수업시간 수정하기");
+                        setLessonDescription("나의 수업시간 수정하기")
+                    } else {
+                        setButtonText("수업개설");
+                        setLessonDescription("수업을 개설하고, 수익을 창출해보세요!")
+                        
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching available times:', error);
+        }
+    };
+
+    fetchAvailableTimes();
+}, []);
+
 
 
   useEffect(() => {
@@ -149,10 +197,10 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
       
         <TouchableOpacity onPress={()=>{navigation.navigate(TRMainScreens.OpenLessonMain)}}>
           <View style={{backgroundColor:'#4169E1',height:screenHeight*0.1,marginTop:'7%',width:screenWidth*0.9,borderRadius:10}}>
-              <Text style={{fontSize:18,fontWeight:'bold',color:'white'}}>수업개설</Text>
-              <Text style={{fontSize:13,color:'white',marginTop:'1%'}}>수업을 개설하고, 수익을 창출해보세요!</Text>
+              <Text style={{fontSize:18,fontWeight:'bold',color:'white'}}>{buttonText}</Text>
+              <Text style={{fontSize:13,color:'white',marginTop:'1%'}}>{lessonDescription}</Text>
           </View>
-        </TouchableOpacity>
+      </TouchableOpacity>
 
       {/* <View style={{backgroundColor:'white',height:screenHeight*0.2,marginTop:'7%',width:screenWidth*0.9,borderRadius:10}}>
         <Text style={{fontSize:18,fontWeight:'bold'}}>프로필 공유</Text>
