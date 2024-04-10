@@ -26,6 +26,7 @@ import ReregisterMemberScreen from '../trainerscreens/ReregisterMemberScreen';
 import AdjustLessonTimeScreen from '../trainerscreens/AdjustLessonTimeScreen';
 import LogInformationSceen from '../trainerscreens/LogInformationSceen';
 import LessonRuleScreen from '../trainerscreens/LessonRuleScreen';
+import OpenLessonTimeScreen from '../trainerscreens/OpenLessonTimeScreen';
 
 
 
@@ -46,6 +47,7 @@ export enum TRMainScreens {
     AllMemberMain ='AllMemberMain',
     ReregisterMemberMain='ReregisterMemberMain',
     OpenLessonMain='OpenLessonMain',
+    AdjustLessonMain='AdjustLessonMain',
     LogInformationMain='LogInformationMain',
     LessonRuleMain='LessonRuleMain'
 };
@@ -68,6 +70,7 @@ export type TRMainStackParamList = {
     AllMemberMain:undefined;
     ReregisterMemberMain:undefined;
     OpenLessonMain:undefined;
+    AdjustLessonMain:undefined;
     LogInformationMain:undefined;
     LessonRuleMain:undefined;
 }
@@ -120,10 +123,18 @@ export type LessonConfirmMainStackParamList = {
 
 
 export enum OpenLessonMainScreens {
-    AdjustLessonTime ='AdjustLessonTime'
+    OpenLessonTime ='OpenLessonTime'
 };
 
 export type OpenLessonMainStackParamList = {
+    OpenLessonTime:undefined;
+};
+
+export enum AdjustLessonMainScreens {
+    AdjustLessonTime ='AdjustLessonTime'
+};
+
+export type AdjustLessonMainStackParamList = {
     AdjustLessonTime:undefined;
 };
 
@@ -167,6 +178,7 @@ const LessonRequestMainStack = createNativeStackNavigator<LessonRequestMainStack
 const LessonTodayMainStack = createNativeStackNavigator<LessonTodayMainStackParamList>();
 const LessonConfirmMainStack = createNativeStackNavigator<LessonConfirmMainStackParamList>();
 const OpenLessonMainStack = createNativeStackNavigator<OpenLessonMainStackParamList>();
+const AdjustLessonMainStack = createNativeStackNavigator<AdjustLessonMainStackParamList>();
 const AllMemberMainStack = createNativeStackNavigator<AllMemberMainStackParamList>();
 const ReregisterMainStack = createNativeStackNavigator<ReregisterMemberMainStackParamList>();
 const LogInfoMainStack = createNativeStackNavigator<LogInfoMainStackParamList>();
@@ -271,6 +283,7 @@ const TRMainStackNavigator: React.FunctionComponent = () => {
             <TRMainStack.Screen name={TRMainScreens.AllMemberMain} component={AllMemberMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.ReregisterMemberMain} component={ReregisterMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.OpenLessonMain} component={OpenLessonMainStackNavigator} />
+            <TRMainStack.Screen name={TRMainScreens.AdjustLessonMain} component={AdjustLessonMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.LogInformationMain} component={LogInfoMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.LessonRuleMain} component={LessonRuleMainStackNavigator} />
         </TRMainStack.Navigator>
@@ -320,8 +333,16 @@ const LessonConfirmMainStackNavigator: React.FunctionComponent = () => {
 const OpenLessonMainStackNavigator: React.FunctionComponent = () => {
     return (
             <OpenLessonMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
-                <OpenLessonMainStack.Screen name={OpenLessonMainScreens.AdjustLessonTime} component={AdjustLessonTimeScreen} options={{headerShown:true,title: '수업시간 설정하기'}}/>
+                <OpenLessonMainStack.Screen name={OpenLessonMainScreens.OpenLessonTime} component={OpenLessonTimeScreen} options={{headerShown:true,title: '수업시간 설정하기'}}/>
             </OpenLessonMainStack.Navigator>
+    );
+}
+
+const AdjustLessonMainStackNavigator: React.FunctionComponent = () => {
+    return (
+            <AdjustLessonMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
+                <AdjustLessonMainStack.Screen name={AdjustLessonMainScreens.AdjustLessonTime} component={AdjustLessonTimeScreen} options={{headerShown:true,title: '수업시간 수정하기'}}/>
+            </AdjustLessonMainStack.Navigator>
     );
 }
 

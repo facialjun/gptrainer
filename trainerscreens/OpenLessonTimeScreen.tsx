@@ -11,26 +11,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../config'
 import uuid from 'react-native-uuid';
 
-
 const BASE_URL = config.SERVER_URL;
-
-
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 
 
-
-//////////////////////////////////////////////////////////////// 코드 타입정의
-
-type AdjustLessonTimeScreenNavigationProps = StackNavigationProp<
+type OpenLessonTimeScreenNavigationProps = StackNavigationProp<
     OpenLessonMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
-    'AdjustLessonTime' 
+    'OpenLessonTime' 
 >;
 
-interface AdjustLessonTimeScreenProps {
-  navigation: AdjustLessonTimeScreenNavigationProps; // 네비게이션 속성에 대한 타입으로 방금 지정해주었던 MainScreenNavigationProps 을 지정
+interface OpenLessonTimeScreenProps {
+  navigation: OpenLessonTimeScreenNavigationProps; // 네비게이션 속성에 대한 타입으로 방금 지정해주었던 MainScreenNavigationProps 을 지정
 };
 
 // 필터 상태 타입
@@ -40,9 +34,10 @@ type FilterType = '매일 같아요' | '요일별로 달라요' | '평일/주말
 
 
 
-const AdjustLessonTimeScreen:React.FunctionComponent<AdjustLessonTimeScreenProps> = ({navigation}) => {
+const OpenLessonTimeScreen:React.FunctionComponent<OpenLessonTimeScreenProps> = ({navigation}) => {
 
-    const [filter, setFilter] = useState<FilterType>('매일 같아요'); // 필터 상태
+
+   const [filter, setFilter] = useState<FilterType>('매일 같아요'); // 필터 상태
     const [allDayLessonTimes, setAllDayLessonTimes] = useState([]);
     const { lessonTimes, addLessonTime, removeLessonTime, setLessonTimes } = adjustLessonTimes();
     const { weekendLessonTimes, addWeekendLessonTime, removeWeekendLessonTime, setWeekendLessonTimes } = diffWeekLessonTimes();
@@ -56,8 +51,6 @@ const AdjustLessonTimeScreen:React.FunctionComponent<AdjustLessonTimeScreenProps
     const [currentEditing, setCurrentEditing] = useState({ day: '', id: null, type: '' });
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [dbAllDayLessonTimes, setDbAllDayLessonTimes] = useState([]);
-    const [allDayHasData, setAllDayHasData] = useState(false);
 
 useEffect(() => {
     const fetchData = async () => {
@@ -86,95 +79,6 @@ useEffect(() => {
 
     fetchData();
 }, []);
-
-
-useEffect(() => {
-    // DB에서 시간 정보를 가져오는 로직
-    const fetchAllDayLessonTimes = async () => {
-    setIsLoading(true);
-    try {
-        let logId = await AsyncStorage.getItem('logId');
-        if (logId) {
-            logId = logId.replace(/^['"](.*)['"]$/, '$1');
-            const response = await axios.get(`${BASE_URL}/available_times`, {
-                params: {
-                    logId: logId,
-                }
-            });
-            if (response.status === 200 && response.data) {
-                const fetchedTimes = response.data.map(({ id, start_time, end_time, day_of_week }) => ({
-                    id: id,
-                    startTime: start_time,
-                    endTime: end_time,
-                    dayOfWeek: day_of_week
-                }));
-                setDbAllDayLessonTimes(fetchedTimes);
-                setAllDayHasData(true);
-                setFilter('매일 같아요')
-            }
-        }
-    } catch (error) {
-        console.log('Error fetching all day lesson times:', error);
-    } finally {
-        setIsLoading(false);
-    }
-};
-
-
-    fetchAllDayLessonTimes();
-}, []);
-
-
-
-const removeAllDayLessonTimeFromDb = async (id, startTime, endTime) => {
-    let logId = await AsyncStorage.getItem('logId');
-    if (logId){
-        logId = logId.replace(/^['"](.*)['"]$/, '$1');
-        console.log(logId);
-        console.log(startTime, endTime);
-
-        try {
-            await axios.delete(`${BASE_URL}/available_times/${logId}/${id}`);
-            // 성공적으로 삭제된 후 UI 업데이트를 위해 상태를 재조정합니다.
-            const filteredTimes = dbAllDayLessonTimes.filter(item => item.id !== id);
-            setDbAllDayLessonTimes(filteredTimes);
-        } catch (error) {
-            console.error('Error deleting lesson time:', error);
-            // 에러 처리 로직 (예: 사용자에게 알림 표시)
-        }
-    } 
-};
-
-
-
-
-const renderAllDayLessonTimes = () => (
-    <>
-        {dbAllDayLessonTimes.map((item) => (
-            <View key={item.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
-                <Text>시작: {item.startTime}</Text>
-                <Text>종료: {item.endTime}</Text>
-                <TouchableOpacity onPress={() => removeAllDayLessonTimeFromDb(item.id, item.startTime, item.endTime)}>
-                    <Icon name="closecircle" size={18} color="red" />
-                </TouchableOpacity>
-            </View>
-        ))}
-
-        {allDayLessonTimes.map((item) => (
-            <View key={item.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
-                <TouchableOpacity onPress={() => { setStartTimePickerVisible(true); setEditingTimeSlotId(item.id); }}>
-                    <Text>시작: {item.startTime}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => { setEndTimePickerVisible(true); setEditingTimeSlotId(item.id); }}>
-                    <Text>종료: {item.endTime}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => allDayRemoveLessonTime(item.id)}>                        
-                    <Icon name="closecircle" size={18} color="red" />
-                </TouchableOpacity>
-            </View>
-        ))}
-    </>
-);
 
 
 // 매일 같아요 시 시작 시간 설정 함수
@@ -209,7 +113,7 @@ const handleSetEndTime = async (time, id) => {
     const allDayAddLessonTime = () => {
         // 간단한 예시를 위해 현재 시간을 startTime으로 사용
         const allDayNewTime = {
-            id: uuid.v4(),// 고유 ID 생성
+            id: uuid.v4(), // 고유 ID 생성
             startTime: selectedStartTime, // 예시 시간
             endTime: selectedEndTime, // 예시 시간
         };
@@ -374,12 +278,6 @@ const addAllDayLessonTimeToDB = async () => {
 };
 
 
-
-
-
-    
-
-
     // 필터에 따른 뷰 렌더링r
         const renderFilterView = () => {
             switch (filter) {
@@ -408,8 +306,19 @@ const addAllDayLessonTimeToDB = async () => {
                                 </TouchableOpacity>
                             </View>
 
-                            {renderAllDayLessonTimes()}
-
+                            {allDayLessonTimes.map((item, index) => (
+                                <View key={item.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                                    <TouchableOpacity onPress={() => { setStartTimePickerVisible(true); setEditingTimeSlotId(item.id); }}>
+                                        <Text>시작: {item.startTime}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => { setEndTimePickerVisible(true); setEditingTimeSlotId(item.id); }}>
+                                        <Text>종료: {item.endTime}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => allDayRemoveLessonTime(item.id)}>
+                                        <Icon name="closecircle" size={18} color="red" />
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
                             <TimePicker 
                                 isVisible={startTimePickerVisible}
                                 onClose={() => setStartTimePickerVisible(false)}
@@ -421,8 +330,6 @@ const addAllDayLessonTimeToDB = async () => {
                                 onConfirm={(time) => handleSetEndTime(time, editingTimeSlotId)}
                             />
                             </View>
-
-                            
                             
                         </ScrollView>
 
@@ -606,12 +513,12 @@ const addAllDayLessonTimeToDB = async () => {
             onPress={() => setFilter(type)}
             style={{
                 marginHorizontal: 10,
-                backgroundColor: filter === type && allDayHasData ? '#4A7AFF' : 'lightgray', // 데이터가 없으면 비활성화된 상태로 변경                padding: 10,
+                backgroundColor: filter === type ? '#4A7AFF' : 'transparent', // 선택된 필터는 파란색 배경
+                padding: 10,
                 borderRadius: 8,
                 borderWidth: 1,
                 borderColor:  filter === type ? 'transparent':'lightgray' ,
             }}
-            disabled={allDayHasData} // 데이터가 없으면 비활성화
         >
             <Text style={{ color: filter === type ? 'white' : 'black' ,fontWeight:'500'}}>
                 {type} 
@@ -629,4 +536,4 @@ const addAllDayLessonTimeToDB = async () => {
     )
 }
 
-export default AdjustLessonTimeScreen
+export default OpenLessonTimeScreen

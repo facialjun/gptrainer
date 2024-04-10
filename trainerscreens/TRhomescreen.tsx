@@ -34,43 +34,46 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
     const [isLoading, setIsLoading] = useState(true);
     const [buttonText, setButtonText] = useState('');
     const [lessonDescription, setLessonDescription] = useState('');
+    const [navigationTarget, setNavigationTarget] = useState(TRMainScreens.OpenLessonMain); // 1. 상태 변수 추가
     
 
 
     useEffect(() => {
-    const fetchAvailableTimes = async () => {
-        try {
-            // AsyncStorage에서 logId 가져오기
-            let logId = await AsyncStorage.getItem('logId');
-            if (logId) {
-                logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
+      const fetchAvailableTimes = async () => {
+          try {
+              // AsyncStorage에서 logId 가져오기
+              let logId = await AsyncStorage.getItem('logId');
+              if (logId) {
+                  logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
 
-                // logId를 사용하여 사용자의 uid를 가져오는 요청
-                const userResponse = await axios.get(`${BASE_URL}/Tuser/${logId}`);
-                if (userResponse.status === 200) {
-                    const uid = userResponse.data.uid;
+                  // logId를 사용하여 사용자의 uid를 가져오는 요청
+                  const userResponse = await axios.get(`${BASE_URL}/Tuser/${logId}`);
+                  if (userResponse.status === 200) {
+                      const uid = userResponse.data.uid;
 
-                    // uid를 사용하여 사용자의 available_times 정보를 가져오는 요청
-                    const timesResponse = await axios.get(`${BASE_URL}/userAvailableTimes/${uid}`);
-                    if (timesResponse.data.hasAvailableTimes) {
-                      
-                        // 여기에서 UI 업데이트 로직을 추가
-                        setButtonText("수업시간 수정하기");
-                        setLessonDescription("나의 수업시간 수정하기")
-                    } else {
-                        setButtonText("수업개설");
-                        setLessonDescription("수업을 개설하고, 수익을 창출해보세요!")
+                      // uid를 사용하여 사용자의 available_times 정보를 가져오는 요청
+                      const timesResponse = await axios.get(`${BASE_URL}/userAvailableTimes/${uid}`);
+                      if (timesResponse.data.hasAvailableTimes) {
                         
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching available times:', error);
-        }
-    };
+                          // 여기에서 UI 업데이트 로직을 추가
+                          setButtonText("수업시간 수정하기");
+                          setLessonDescription("나의 수업시간 수정하기")
+                          setNavigationTarget(TRMainScreens.AdjustLessonMain); 
+                      } else {
+                          setButtonText("수업개설");
+                          setLessonDescription("수업을 개설하고, 수익을 창출해보세요!");
+                          setNavigationTarget(TRMainScreens.OpenLessonMain); 
+                          
+                      }
+                  }
+              }
+          } catch (error) {
+              console.error('Error fetching available times:', error);
+          }
+      };
 
-    fetchAvailableTimes();
-}, []);
+      fetchAvailableTimes();
+  }, []);
 
 
 
@@ -195,7 +198,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
 
       </View>
       
-        <TouchableOpacity onPress={()=>{navigation.navigate(TRMainScreens.OpenLessonMain)}}>
+        <TouchableOpacity onPress={() => navigation.navigate(navigationTarget)}>
           <View style={{backgroundColor:'#4169E1',height:screenHeight*0.1,marginTop:'7%',width:screenWidth*0.9,borderRadius:10}}>
               <Text style={{fontSize:18,fontWeight:'bold',color:'white'}}>{buttonText}</Text>
               <Text style={{fontSize:13,color:'white',marginTop:'1%'}}>{lessonDescription}</Text>
