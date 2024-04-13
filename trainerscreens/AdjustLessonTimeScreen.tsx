@@ -42,7 +42,7 @@ type FilterType = '매일 같아요' | '요일별로 달라요' | '평일/주말
 
 const AdjustLessonTimeScreen:React.FunctionComponent<AdjustLessonTimeScreenProps> = ({navigation}) => {
 
-    const [filter, setFilter] = useState<FilterType>('매일 같아요'); // 필터 상태
+    const [filter, setFilter] = useState<FilterType>(); // 필터 상태
     const [allDayLessonTimes, setAllDayLessonTimes] = useState([]);
     const { lessonTimes, addLessonTime, removeLessonTime, setLessonTimes } = adjustLessonTimes();
     const { weekendLessonTimes, addWeekendLessonTime, removeWeekendLessonTime, setWeekendLessonTimes } = diffWeekLessonTimes();
@@ -58,6 +58,30 @@ const AdjustLessonTimeScreen:React.FunctionComponent<AdjustLessonTimeScreenProps
     const [isLoading, setIsLoading] = useState(true);
     const [dbAllDayLessonTimes, setDbAllDayLessonTimes] = useState([]);
     const [allDayHasData, setAllDayHasData] = useState(false);
+    const [dbWeeklyDayLessonTimes, setDbWeeklyDayLessonTimes] = useState([]);
+    const [weeklyDayHasData, setWeeklyDayHasData] = useState(false);  
+    const [dbDiffDayLessonTimes, setDbDiffDayLessonTimes] = useState([]);
+    const [diffDayHasData, setDiffDayHasData] = useState(false);  
+
+
+useEffect(() => {
+    checkAndSetFilter();
+}, [allDayHasData, weeklyDayHasData, diffDayHasData]);  // 상태가 변경될 때마다 checkAndSetFilter 호출
+
+const checkAndSetFilter = () => {
+    if (allDayHasData) {
+        setFilter('매일 같아요');
+        console.log(1)
+    } else if (weeklyDayHasData) {
+        setFilter('요일별로 달라요');
+         console.log(2)
+    } else if (diffDayHasData) {
+        setFilter('평일/주말 달라요');
+         console.log(3)
+    }
+};
+
+
 
 useEffect(() => {
     const fetchData = async () => {
@@ -87,7 +111,6 @@ useEffect(() => {
     fetchData();
 }, []);
 
-
 useEffect(() => {
     // DB에서 시간 정보를 가져오는 로직
     const fetchAllDayLessonTimes = async () => {
@@ -96,7 +119,7 @@ useEffect(() => {
         let logId = await AsyncStorage.getItem('logId');
         if (logId) {
             logId = logId.replace(/^['"](.*)['"]$/, '$1');
-            const response = await axios.get(`${BASE_URL}/available_times`, {
+            const response = await axios.get(`${BASE_URL}/allDayAvailable_times`, {
                 params: {
                     logId: logId,
                 }
@@ -110,8 +133,10 @@ useEffect(() => {
                 }));
                 setDbAllDayLessonTimes(fetchedTimes);
                 setAllDayHasData(true);
-                setFilter('매일 같아요')
             }
+            else {
+                    setAllDayHasData(false); // 데이터가 없으면 false로 설정
+                }
         }
     } catch (error) {
         console.log('Error fetching all day lesson times:', error);
@@ -122,7 +147,98 @@ useEffect(() => {
 
 
     fetchAllDayLessonTimes();
+    
 }, []);
+
+
+useEffect(() => {
+    const fetchWeeklyDayLessonTimes = async () => {
+        setIsLoading(true);
+        try {
+            let logId = await AsyncStorage.getItem('logId');
+            if (logId) {
+                logId = logId.replace(/^['"](.*)['"]$/, '$1');
+                const response = await axios.get(`${BASE_URL}/weeklyDayAvailable_times`, {
+                    params: { logId: logId }
+                });
+                if (response.status === 200 && response.data) {
+                    // 요일별로 데이터를 분류하여 저장
+                    const sortedTimes = response.data.reduce((acc, current) => {
+                        const day = current.day_of_week;
+                        if (!acc[day]) {
+                            acc[day] = [];
+                        }
+                        acc[day].push({
+                            id: current.id,
+                            startTime: current.start_time,
+                            endTime: current.end_time,
+                            dayOfWeek: day
+                        });
+                        return acc;
+                    }, {});
+                    setDbWeeklyDayLessonTimes(sortedTimes);
+                    console.log(sortedTimes);
+                    setWeeklyDayHasData(true); // 데이터가 존재하면 true로 설정
+                } else {
+                    setWeeklyDayHasData(false); // 데이터가 없으면 false로 설정
+                }
+            }
+        } catch (error) {
+            console.log('Error fetching weekly day lesson times:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    fetchWeeklyDayLessonTimes();
+    
+}, []);
+
+useEffect(() => {
+    const fetchDiffDayLessonTimes = async () => {
+        setIsLoading(true);
+        try {
+            let logId = await AsyncStorage.getItem('logId');
+            if (logId) {
+                logId = logId.replace(/^['"](.*)['"]$/, '$1');
+                const response = await axios.get(`${BASE_URL}/diffDayAvailable_times`, {
+                    params: { logId: logId }
+                });
+                if (response.status === 200 && response.data) {
+                    // 요일별로 데이터를 분류하여 저장
+                    const sortedTimes = response.data.reduce((acc, current) => {
+                        const day = current.day_of_week;
+                        if (!acc[day]) {
+                            acc[day] = [];
+                        }
+                        acc[day].push({
+                            id: current.id,
+                            startTime: current.start_time,
+                            endTime: current.end_time,
+                            dayOfWeek: day
+                        });
+                        return acc;
+                    }, {});
+                    setDbDiffDayLessonTimes(sortedTimes);
+                    console.log(sortedTimes);
+                    setDiffDayHasData(true); // 데이터가 존재하면 true로 설정
+                } else {
+                    setDiffDayHasData(false); // 데이터가 없으면 false로 설정
+                }
+            }
+        } catch (error) {
+            console.log('Error fetching weekly day lesson times:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    fetchDiffDayLessonTimes();
+    
+}, []);
+
+
+
 
 
 
@@ -134,7 +250,7 @@ const removeAllDayLessonTimeFromDb = async (id, startTime, endTime) => {
         console.log(startTime, endTime);
 
         try {
-            await axios.delete(`${BASE_URL}/available_times/${logId}/${id}`);
+            await axios.delete(`${BASE_URL}/allDayAvailable_times/${logId}/${id}`);
             // 성공적으로 삭제된 후 UI 업데이트를 위해 상태를 재조정합니다.
             const filteredTimes = dbAllDayLessonTimes.filter(item => item.id !== id);
             setDbAllDayLessonTimes(filteredTimes);
@@ -144,6 +260,57 @@ const removeAllDayLessonTimeFromDb = async (id, startTime, endTime) => {
         }
     } 
 };
+
+const removeWeeklyDayLessonTimeFromDb = async (day, id, startTime, endTime) => {
+    let logId = await AsyncStorage.getItem('logId');
+    if (logId){
+        logId = logId.replace(/^['"](.*)['"]$/, '$1');
+        console.log(logId);
+        console.log(startTime, endTime);
+
+        try {
+            await axios.delete(`${BASE_URL}/weeklyDayAvailable_times/${logId}/${id}`);
+            // 요일별 배열 접근 및 필터링
+            if (dbWeeklyDayLessonTimes && Array.isArray(dbWeeklyDayLessonTimes[day])) {
+                const filteredTimes = dbWeeklyDayLessonTimes[day].filter(item => item.id !== id);
+                setDbWeeklyDayLessonTimes({
+                    ...dbWeeklyDayLessonTimes,
+                    [day]: filteredTimes
+                });
+            } else {
+                console.error('dbWeeklyDayLessonTimes[day] is not an array or does not exist.');
+            }
+        } catch (error) {
+            console.error('Error deleting lesson time:', error);
+        }
+    } 
+};
+
+const removeDiffDayLessonTimeFromDb = async (day, id, startTime, endTime) => {
+    let logId = await AsyncStorage.getItem('logId');
+    if (logId){
+        logId = logId.replace(/^['"](.*)['"]$/, '$1');
+        console.log(logId);
+        console.log(startTime, endTime);
+
+        try {
+            await axios.delete(`${BASE_URL}/diffDayAvailable_times/${logId}/${id}`);
+            // 요일별 배열 접근 및 필터링
+            if (dbDiffDayLessonTimes && Array.isArray(dbDiffDayLessonTimes[day])) {
+                const filteredTimes = dbDiffDayLessonTimes[day].filter(item => item.id !== id);
+                setDbDiffDayLessonTimes({
+                    ...dbDiffDayLessonTimes,
+                    [day]: filteredTimes
+                });
+            } else {
+                console.error('dbDiffDayLessonTimes[day] is not an array or does not exist.');
+            }
+        } catch (error) {
+            console.error('Error deleting lesson time:', error);
+        }
+    } 
+};
+
 
 
 
@@ -171,6 +338,85 @@ const renderAllDayLessonTimes = () => (
                 <TouchableOpacity onPress={() => allDayRemoveLessonTime(item.id)}>                        
                     <Icon name="closecircle" size={18} color="red" />
                 </TouchableOpacity>
+            </View>
+        ))}
+    </>
+);
+
+
+const renderWeeklyDayLessonTimes = () => (
+    <>
+        {Object.keys(lessonTimes).map((day) => (
+            <View key={day} style={{ width: screenWidth*0.9, borderRadius: 8, borderWidth: 1, borderColor: '#4A7AFF', backgroundColor: 'white', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: 'lightgray'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                    <Text style={{ fontSize: 15, fontWeight:'600' }}>{day}</Text>
+                    <TouchableOpacity onPress={() => handleAddLessonTime(day)}>
+                        <Icon name="pluscircle" size={20} color="#4A7AFF" />
+                    </TouchableOpacity>
+                </View>
+
+                {dbWeeklyDayLessonTimes[day]?.map((item) => (
+                    <View key={item.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                        <Text>시작: {item.startTime}</Text>
+                        <Text>종료: {item.endTime}</Text>
+                        <TouchableOpacity onPress={()=>{removeWeeklyDayLessonTimeFromDb(day, item.id, item.startTime, item.endTime)}}>
+                            <Icon name="closecircle" size={18} color="red" />
+                        </TouchableOpacity>
+                    </View>
+                ))}
+
+                {lessonTimes[day]?.map((timeSlot) => (
+                    <View key={timeSlot.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                        <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'startTime')}>
+                            <Text>시작: {timeSlot.startTime}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endTime')}>
+                            <Text>종료: {timeSlot.endTime}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => removeLessonTime(day, timeSlot.id)}>
+                            <Icon name="closecircle" size={20} color="red" />
+                        </TouchableOpacity>
+                    </View>
+                ))}
+            </View>
+        ))}
+    </>
+);
+
+const renderDiffDayLessonTimes = () => (
+    <>
+        {diffWeekDays.map((day) => (
+            <View key={day} style={{ width: screenWidth*0.9, borderRadius: 8, borderWidth: 1, borderColor: '#4A7AFF', backgroundColor: 'white', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: 'lightgray'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                    <Text style={{ fontSize: 15, fontWeight:'600' }}>{day}</Text>
+                    <TouchableOpacity onPress={() => handleAddLessonTime(day)}>
+                        <Icon name="pluscircle" size={20} color="#4A7AFF" />
+                    </TouchableOpacity>
+                </View>
+
+                {dbDiffDayLessonTimes[day]?.map((item) => (
+                    <View key={item.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                        <Text>시작: {item.startTime}</Text>
+                        <Text>종료: {item.endTime}</Text>
+                        <TouchableOpacity onPress={()=>{removeDiffDayLessonTimeFromDb(day, item.id, item.startTime, item.endTime)}}>
+                            <Icon name="closecircle" size={18} color="red" />
+                        </TouchableOpacity>
+                    </View>
+                ))}
+
+                {weekendLessonTimes[day]?.map((timeSlot) => (
+                    <View key={timeSlot.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
+                        <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'startTime')}>
+                            <Text>시작: {timeSlot.startTime}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endTime')}>
+                            <Text>종료: {timeSlot.endTime}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => removeLessonTime(day, timeSlot.id)}>
+                            <Icon name="closecircle" size={20} color="red" />
+                        </TouchableOpacity>
+                    </View>
+                ))}
             </View>
         ))}
     </>
@@ -342,7 +588,7 @@ const addAllDayLessonTimeToDB = async () => {
 
 
 
-        const diffWeekendToDB = async () => {
+const diffWeekendToDB = async () => {
     let logId = await AsyncStorage.getItem('logId');
     if (logId) {
         logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
@@ -445,47 +691,9 @@ const addAllDayLessonTimeToDB = async () => {
 
                     <View style={{height:'auto',justifyContent:'center',alignItems:'center'}}>
                         <ScrollView style={{ height:'auto',marginTop:'5%' }}>
-                        {Object.keys(lessonTimes).map((day) => (
-                            <View key={day} style={{ 
-                                    width: screenWidth*0.9, 
-                                    borderRadius: 8, 
-                                    borderWidth: 1, 
-                                    borderColor: '#4A7AFF', 
-                                    backgroundColor: 'white', 
-                                    marginBottom: 20,
-                                    borderBottomWidth: 1, // 요일 간 구분선을 위한 하단 테두리 너비 설정
-                                    borderBottomColor: 'lightgray', // 하단 테두리 색상 설정
-                                    }}>
-                            
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
-                                    <Text style={{ fontSize: 15, fontWeight:'600' }}>{day}</Text>
 
-                                    <TouchableOpacity onPress={() => handleAddLessonTime(day)}>
-                                        <Icon name="pluscircle" size={20} color="#4A7AFF" />
-                                    </TouchableOpacity>
-
-                            </View>
-
-                            {lessonTimes[day].map((timeSlot) => (
-                                <View key={timeSlot.id} style={{ 
-                                        flexDirection: 'row', 
-                                        justifyContent: 'space-between', 
-                                        alignItems: 'center', 
-                                        padding: 20 
-                                        }}>
-                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'startTime')}>
-                                    <Text>시작: {timeSlot.startTime}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endTime')}>
-                                    <Text>종료: {timeSlot.endTime}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => removeLessonTime(day, timeSlot.id)}>
-                                    <Icon name="closecircle" size={20} color="red" />
-                                </TouchableOpacity>
-                                </View>
-                            ))}
-                            </View>
-                        ))}
+                            {renderWeeklyDayLessonTimes()}
+                        
                         {isTimePickerVisible && (
                             <TimePicker
                             isVisible={isTimePickerVisible}
@@ -512,9 +720,11 @@ const addAllDayLessonTimeToDB = async () => {
                 
             case '평일/주말 달라요':
                     return (
-                       <View style={{ backgroundColor: 'white', height: screenHeight * 0.75 }}>
+                       <View style={{ backgroundColor: 'white', height: screenHeight * 0.75,justifyContent:'center',alignItems:'center' }}>
                             <ScrollView style={{ flex: 1 }}>
-                                {diffWeekDays.map((day) => (
+
+                                {renderDiffDayLessonTimes()}
+                                {/* {diffWeekDays.map((day) => (
                                     <View key={day} style={{ 
                                             width: screenWidth * 0.9, 
                                             alignSelf: 'center', 
@@ -548,7 +758,7 @@ const addAllDayLessonTimeToDB = async () => {
                                             </View>
                                         ))}
                                     </View>
-                                ))}
+                                ))} */}
                             </ScrollView>
                                 {isTimePickerVisible && (
                                 <TimePicker
@@ -600,24 +810,61 @@ const addAllDayLessonTimeToDB = async () => {
             width: screenWidth,
             paddingHorizontal:10
             }}>
-        {(['매일 같아요', '요일별로 달라요', '평일/주말 달라요'] as FilterType[]).map((type) => (
+
+                {(['매일 같아요', '요일별로 달라요', '평일/주말 달라요'] as FilterType[]).map((type) => {
+                        // 각 필터 유형에 따라 비활성화 조건 설정
+                        
+                        // let disabled = false;
+                        //     if (diffDayHasData && (type === '매일 같아요' || type === '요일별로 달라요')) {
+                        //         disabled = true;  // '평일/주말 데이터'가 있을 때 '매일 같아요'와 '요일별로 달라요'를 비활성화
+                        //     } else if (allDayHasData && (type === '요일별로 달라요' || type === '평일/주말 달라요')) {
+                        //         disabled = true;  // '매일 데이터'가 있을 때 '요일별로 달라요'와 '평일/주말 달라요'를 비활성화
+                        //     } else if (weeklyDayHasData && (type === '매일 같아요' || type === '평일/주말 달라요')) {
+                        //         disabled = true;  // '주간 데이터'가 있을 때 '매일 같아요'와 '평일/주말 달라요'를 비활성화
+                        //     }
+
+                        return (
+                            <TouchableOpacity
+                                key={type}
+                                onPress={() => setFilter(type)}
+                                style={{
+                                    marginHorizontal: 10,
+                                    backgroundColor: filter === type ? '#4A7AFF' : 'transparent',  // 선택된 필터는 파란색 배경
+                                    padding: 10,
+                                    borderRadius: 8,
+                                    borderWidth: 1,
+                                    borderColor: filter === type ? 'transparent' : 'lightgray',
+                                    // opacity: disabled ? 0.5 : 1  // 비활성화된 경우 투명도 적용
+                                }}
+                                // disabled={disabled}  // 비활성화 상태 적용
+                            >
+                                <Text style={{ color: filter === type ? 'white' : 'black', fontWeight: '500' }}>
+                                    {type}
+                                </Text>
+                            </TouchableOpacity>
+                        );
+                    })}
+
+        {/* {(['매일 같아요', '요일별로 달라요', '평일/주말 달라요'] as FilterType[]).map((type) => (
+            
         <TouchableOpacity
             key={type}
             onPress={() => setFilter(type)}
             style={{
                 marginHorizontal: 10,
-                backgroundColor: filter === type && allDayHasData ? '#4A7AFF' : 'lightgray', // 데이터가 없으면 비활성화된 상태로 변경                padding: 10,
+                backgroundColor: filter === type ? '#4A7AFF' : 'transparent', // 선택된 필터는 파란색 배경
+                padding: 10,
                 borderRadius: 8,
                 borderWidth: 1,
                 borderColor:  filter === type ? 'transparent':'lightgray' ,
             }}
-            disabled={allDayHasData} // 데이터가 없으면 비활성화
+            
         >
             <Text style={{ color: filter === type ? 'white' : 'black' ,fontWeight:'500'}}>
                 {type} 
             </Text>
         </TouchableOpacity>
-        ))}
+        ))} */}
     </View>
     
             {renderFilterView()}
