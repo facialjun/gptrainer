@@ -1,7 +1,7 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react'
 import { View,Text, BackHandler, Dimensions, TouchableOpacity, Platform,ScrollView,Alert  } from 'react-native'
-import { OpenLessonMainStackParamList, TRMainScreens } from '../stacks/Navigator';
+import { AdjustLessonMainStackParamList, TRMainScreens } from '../stacks/Navigator';
 import Icon from 'react-native-vector-icons/AntDesign'; 
 import { adjustLessonTimes } from '../lessonTime/AdjustLessonTime'
 import { diffWeekLessonTimes } from '../lessonTime/WeekendTime';
@@ -25,7 +25,7 @@ const screenHeight = Dimensions.get('screen').height;
 //////////////////////////////////////////////////////////////// 코드 타입정의
 
 type AdjustLessonTimeScreenNavigationProps = StackNavigationProp<
-    OpenLessonMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
+    AdjustLessonMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
     'AdjustLessonTime' 
 >;
 
@@ -42,7 +42,7 @@ type FilterType = '매일 같아요' | '요일별로 달라요' | '평일/주말
 
 const AdjustLessonTimeScreen:React.FunctionComponent<AdjustLessonTimeScreenProps> = ({navigation}) => {
 
-    const [filter, setFilter] = useState<FilterType>(); // 필터 상태
+    const [filter, setFilter] = useState<FilterType>('매일 같아요'); // 필터 상태
     const [allDayLessonTimes, setAllDayLessonTimes] = useState([]);
     const { lessonTimes, addLessonTime, removeLessonTime, setLessonTimes } = adjustLessonTimes();
     const { weekendLessonTimes, addWeekendLessonTime, removeWeekendLessonTime, setWeekendLessonTimes } = diffWeekLessonTimes();
@@ -56,12 +56,12 @@ const AdjustLessonTimeScreen:React.FunctionComponent<AdjustLessonTimeScreenProps
     const [currentEditing, setCurrentEditing] = useState({ day: '', id: null, type: '' });
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [dbAllDayLessonTimes, setDbAllDayLessonTimes] = useState([]);
     const [allDayHasData, setAllDayHasData] = useState(false);
-    const [dbWeeklyDayLessonTimes, setDbWeeklyDayLessonTimes] = useState([]);
     const [weeklyDayHasData, setWeeklyDayHasData] = useState(false);  
-    const [dbDiffDayLessonTimes, setDbDiffDayLessonTimes] = useState([]);
     const [diffDayHasData, setDiffDayHasData] = useState(false);  
+    const [dbAllDayLessonTimes, setDbAllDayLessonTimes] = useState([]);
+    const [dbWeeklyDayLessonTimes, setDbWeeklyDayLessonTimes] = useState([]);
+    const [dbDiffDayLessonTimes, setDbDiffDayLessonTimes] = useState([]);
 
 
 useEffect(() => {
@@ -74,10 +74,10 @@ const checkAndSetFilter = () => {
         console.log(1)
     } else if (weeklyDayHasData) {
         setFilter('요일별로 달라요');
-         console.log(2)
+        console.log(2)
     } else if (diffDayHasData) {
         setFilter('평일/주말 달라요');
-         console.log(3)
+        console.log(3)
     }
 };
 
@@ -98,7 +98,6 @@ useEffect(() => {
                 if (response.status === 200) {
                     setUserData(response.data);
                     console.log('Fetched User Data:', response.data);
-
                 }
             }
         } catch (error) {
@@ -124,7 +123,7 @@ useEffect(() => {
                     logId: logId,
                 }
             });
-            if (response.status === 200 && response.data) {
+            if (response.status === 200 && response.data.length > 0) {
                 const fetchedTimes = response.data.map(({ id, start_time, end_time, day_of_week }) => ({
                     id: id,
                     startTime: start_time,
@@ -132,11 +131,14 @@ useEffect(() => {
                     dayOfWeek: day_of_week
                 }));
                 setDbAllDayLessonTimes(fetchedTimes);
-                setAllDayHasData(true);
+                // 여기서 allDayHasData를 설정합니다.
+                    setAllDayHasData(response.data.some(item => item.day_of_week === 'All'));
+                    console.log("매일",allDayHasData)
             }
             else {
                     setAllDayHasData(false); // 데이터가 없으면 false로 설정
                 }
+                
         }
     } catch (error) {
         console.log('Error fetching all day lesson times:', error);
@@ -162,7 +164,7 @@ useEffect(() => {
                     params: { logId: logId }
                 });
                 if (response.status === 200 && response.data) {
-                    // 요일별로 데이터를 분류하여 저장
+                    const weekDays = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
                     const sortedTimes = response.data.reduce((acc, current) => {
                         const day = current.day_of_week;
                         if (!acc[day]) {
@@ -178,10 +180,13 @@ useEffect(() => {
                     }, {});
                     setDbWeeklyDayLessonTimes(sortedTimes);
                     console.log(sortedTimes);
-                    setWeeklyDayHasData(true); // 데이터가 존재하면 true로 설정
+                    // 여기서 weeklyDayHasData를 설정합니다.
+                    setWeeklyDayHasData(response.data.some(item => weekDays.includes(item.day_of_week)));
+                    console.log("요일별",weeklyDayHasData)
                 } else {
                     setWeeklyDayHasData(false); // 데이터가 없으면 false로 설정
                 }
+                
             }
         } catch (error) {
             console.log('Error fetching weekly day lesson times:', error);
@@ -205,7 +210,7 @@ useEffect(() => {
                     params: { logId: logId }
                 });
                 if (response.status === 200 && response.data) {
-                    // 요일별로 데이터를 분류하여 저장
+                    const weekDays = ['평일', '주말'];
                     const sortedTimes = response.data.reduce((acc, current) => {
                         const day = current.day_of_week;
                         if (!acc[day]) {
@@ -221,10 +226,13 @@ useEffect(() => {
                     }, {});
                     setDbDiffDayLessonTimes(sortedTimes);
                     console.log(sortedTimes);
-                    setDiffDayHasData(true); // 데이터가 존재하면 true로 설정
+                   // 여기서 weeklyDayHasData를 설정합니다.
+                    setDiffDayHasData(response.data.some(item => weekDays.includes(item.day_of_week)));
+                    console.log("평주",diffDayHasData)
                 } else {
                     setDiffDayHasData(false); // 데이터가 없으면 false로 설정
                 }
+                
             }
         } catch (error) {
             console.log('Error fetching weekly day lesson times:', error);
@@ -386,10 +394,21 @@ const renderWeeklyDayLessonTimes = () => (
 const renderDiffDayLessonTimes = () => (
     <>
         {diffWeekDays.map((day) => (
-            <View key={day} style={{ width: screenWidth*0.9, borderRadius: 8, borderWidth: 1, borderColor: '#4A7AFF', backgroundColor: 'white', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: 'lightgray'}}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
-                    <Text style={{ fontSize: 15, fontWeight:'600' }}>{day}</Text>
-                    <TouchableOpacity onPress={() => handleAddLessonTime(day)}>
+            <View key={day} 
+            style={{ width: screenWidth * 0.9, 
+                    alignSelf: 'center', 
+                    borderRadius: 8, 
+                    borderWidth: 1, 
+                    borderColor: '#4A7AFF', 
+                    backgroundColor: 'white', 
+                    marginBottom: 20, 
+                    paddingBottom: 20, 
+                    borderBottomWidth: 1, 
+                    borderBottomColor: 'lightgray'
+                }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20,marginTop:'4%' }}>
+                    <Text style={{ fontSize: 22, fontWeight: '600' }}>{day}</Text>
+                    <TouchableOpacity onPress={() => addWeekendLessonTime(day, '00:00', '00:00')}>
                         <Icon name="pluscircle" size={20} color="#4A7AFF" />
                     </TouchableOpacity>
                 </View>
@@ -412,7 +431,7 @@ const renderDiffDayLessonTimes = () => (
                         <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endTime')}>
                             <Text>종료: {timeSlot.endTime}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => removeLessonTime(day, timeSlot.id)}>
+                        <TouchableOpacity onPress={() => removeWeekendLessonTime(day, timeSlot.id)}>
                             <Icon name="closecircle" size={20} color="red" />
                         </TouchableOpacity>
                     </View>
