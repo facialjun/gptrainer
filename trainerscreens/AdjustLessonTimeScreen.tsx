@@ -831,16 +831,6 @@ const diffWeekendToDB = async () => {
             }}>
 
                 {(['매일 같아요', '요일별로 달라요', '평일/주말 달라요'] as FilterType[]).map((type) => {
-                        // 각 필터 유형에 따라 비활성화 조건 설정
-                        
-                        // let disabled = false;
-                        //     if (diffDayHasData && (type === '매일 같아요' || type === '요일별로 달라요')) {
-                        //         disabled = true;  // '평일/주말 데이터'가 있을 때 '매일 같아요'와 '요일별로 달라요'를 비활성화
-                        //     } else if (allDayHasData && (type === '요일별로 달라요' || type === '평일/주말 달라요')) {
-                        //         disabled = true;  // '매일 데이터'가 있을 때 '요일별로 달라요'와 '평일/주말 달라요'를 비활성화
-                        //     } else if (weeklyDayHasData && (type === '매일 같아요' || type === '평일/주말 달라요')) {
-                        //         disabled = true;  // '주간 데이터'가 있을 때 '매일 같아요'와 '평일/주말 달라요'를 비활성화
-                        //     }
 
                         return (
                             <TouchableOpacity
@@ -853,9 +843,7 @@ const diffWeekendToDB = async () => {
                                     borderRadius: 8,
                                     borderWidth: 1,
                                     borderColor: filter === type ? 'transparent' : 'lightgray',
-                                    // opacity: disabled ? 0.5 : 1  // 비활성화된 경우 투명도 적용
                                 }}
-                                // disabled={disabled}  // 비활성화 상태 적용
                             >
                                 <Text style={{ color: filter === type ? 'white' : 'black', fontWeight: '500' }}>
                                     {type}
@@ -864,32 +852,9 @@ const diffWeekendToDB = async () => {
                         );
                     })}
 
-        {/* {(['매일 같아요', '요일별로 달라요', '평일/주말 달라요'] as FilterType[]).map((type) => (
-            
-        <TouchableOpacity
-            key={type}
-            onPress={() => setFilter(type)}
-            style={{
-                marginHorizontal: 10,
-                backgroundColor: filter === type ? '#4A7AFF' : 'transparent', // 선택된 필터는 파란색 배경
-                padding: 10,
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor:  filter === type ? 'transparent':'lightgray' ,
-            }}
-            
-        >
-            <Text style={{ color: filter === type ? 'white' : 'black' ,fontWeight:'500'}}>
-                {type} 
-            </Text>
-        </TouchableOpacity>
-        ))} */}
     </View>
     
             {renderFilterView()}
-
-
-        
 
         </View>
     )

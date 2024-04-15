@@ -116,7 +116,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
 
           <View style={{width:100,height:100}}>
             <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMemberMain)}}
+            onPress={()=>{navigation.navigate(TRMainScreens.NewMemberMain)}}
             style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
               <Text>
                 2

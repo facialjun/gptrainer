@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { View,Text, BackHandler, Dimensions,ScrollView, StyleSheet, TouchableOpacity} from 'react-native'
-import { AllMemberMainStackParamList,  AllMemberMainScreens} from '../stacks/Navigator';
+import { NewMemberMainStackParamList } from '../stacks/Navigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,17 +18,16 @@ const screenHeight = Dimensions.get('screen').height;
 
 //////////////////////////////////////////////////////////////// 코드 타입정의
 
-type AllMemberScreenNavigationProps = StackNavigationProp<
-    AllMemberMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
-    'AllMember' 
+type NewMemberScreenNavigationProps = StackNavigationProp<
+    NewMemberMainStackParamList, // navigators/HomeStackNavigators/index.tsx 에서 지정했던 HomeStackParamList
+    'NewMember' 
 >;
 
-interface AllMemberScreenProps {
-  navigation: AllMemberScreenNavigationProps; // 네비게이션 속성에 대한 타입으로 방금 지정해주었던 MainScreenNavigationProps 을 지정
+interface NewMemberScreenProps {
+  navigation: NewMemberScreenNavigationProps; // 네비게이션 속성에 대한 타입으로 방금 지정해주었던 MainScreenNavigationProps 을 지정
 };
 
-
-const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigation}) => {
+const NewMemberScreen:React.FunctionComponent<NewMemberScreenProps> = ({navigation}) => {
 
     const [userData, setUserData] = useState(null);
     const [membershipData, setMembershipData] = useState([]);
@@ -83,7 +82,7 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
                     let logId = await AsyncStorage.getItem('logId');
                     if (logId) {
                         logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
-                        const response = await axios.get(`${BASE_URL}/AllMember/${logId}`);
+                        const response = await axios.get(`${BASE_URL}/NewMember/${logId}`);
                         setMembershipData(response.data);
                         console.log(response.data)
                     }
@@ -96,6 +95,7 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
 
             fetchData();
         }, []);
+
 
 
 
@@ -116,7 +116,7 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
     )
 }
 
-export default AllMemberScreen
+export default NewMemberScreen
 
 const styles = StyleSheet.create({
     container: {
