@@ -106,7 +106,7 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
                 <View key={data.tmid} style={styles.card}>
                     {/* <Text style={styles.title}>회원번호: {data.tmid}</Text> */}
                     <Text style={styles.text}>Name: {data.username}</Text>
-                    <Text style={styles.text}>Sessions: {data.session}</Text>
+                    <Text style={styles.text}>Sessions: {data.used_time}/{data.session}</Text>
                     <Text style={styles.text}>Email: {data.email}</Text>
                     <Text style={styles.text}>Phone: {data.phone_number}</Text>
                 </View>
@@ -120,7 +120,7 @@ export default AllMemberScreen
 
 const styles = StyleSheet.create({
     container: {
-        height:'auto',
+        height:'100%',
         padding: 10,
     },
     card: {

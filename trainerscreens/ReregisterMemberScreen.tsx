@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View,Text, BackHandler, Dimensions } from 'react-native'
+import { View,Text, BackHandler, Dimensions,ScrollView,StyleSheet } from 'react-native'
 import { ReregisterMemberMainStackParamList, ReregisterMemberMainScreens } from '../stacks/Navigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import axios from 'axios';
@@ -26,9 +26,54 @@ interface ReregisterMemberScreenProps {
 
 const ReregisterMemberScreen:React.FunctionComponent<ReregisterMemberScreenProps> = ({navigation}) => {
 
-    const [userData, setUserData] = useState(null);
-    const [membershipData, setMembershipData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+
+
+    useEffect(() => {
+            const backAction = () => {
+                navigation.goBack(); // 이전 화면으로 돌아가기
+                return true; // 이벤트 버블링을 방지
+            };
+
+            const backHandler = BackHandler.addEventListener(
+                "hardwareBackPress",
+                backAction
+            );
+
+            return () => backHandler.remove();
+        }, [navigation]); // 의존성 배열에 navigation 추가
+
+        useEffect(() => {
+            const fetchData = async () => {
+                setIsLoading(true);
+                try {
+                    // AsyncStorage에서 logId 가져오기
+                    let logId = await AsyncStorage.getItem('logId');
+                    console.log(logId)
+                    if (logId) {
+                        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
+
+                        // logId를 사용하여 사용자 데이터 가져오기
+                        const response = await axios.get(`${BASE_URL}/Tuser/${logId}`);
+                        if (response.status === 200) {
+                            setUserData(response.data);
+                            // console.log('Fetched User Data:', response.data);
+                        }
+                    }
+                } catch (error) {
+                    console.log('Error:', error);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            fetchData();
+        }, []);
+
+
+        const [userData, setUserData] = useState(null);
+        const [membershipData, setMembershipData] = useState([]);
+        const [isLoading, setIsLoading] = useState(true);
+
 
     useEffect(() => {
             const backAction = () => {
@@ -73,32 +118,71 @@ const ReregisterMemberScreen:React.FunctionComponent<ReregisterMemberScreenProps
 
 
 
-        // useEffect(() => {
-        //     const fetchData = async () => {
-        //         try {
-        //             let logId = await AsyncStorage.getItem('logId');
-        //             if (logId) {
-        //                 logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
-        //                 const response = await axios.get(`${BASE_URL}/NewMember/${logId}`);
-        //                 setMembershipData(response.data);
-        //                 console.log(response.data)
-        //             }
-        //         } catch (error) {
-        //             console.error('Error fetching data:', error);
-        //         } finally {
-        //             setIsLoading(false);
-        //         }
-        //     };
+        useEffect(() => {
+            const fetchData = async () => {
+                try {
+                    let logId = await AsyncStorage.getItem('logId');
+                    if (logId) {
+                        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
+                        const response = await axios.get(`${BASE_URL}/ReregisterMember/${logId}`);
+                        setMembershipData(response.data);
+                        console.log(response.data)
+                    }
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
 
-        //     fetchData();
-        // }, []);
+            fetchData();
+        }, []);
 
 
 
 
     return (
-        <View><Text>ReregisterMemberScreen</Text></View>
+        <ScrollView style={styles.container}>
+        {membershipData.map((data) => (
+            
+                <View key={data.tmid} style={styles.card}>
+                    {/* <Text style={styles.title}>회원번호: {data.tmid}</Text> */}
+                    <Text style={styles.text}>Name: {data.username}</Text>
+                    <Text style={styles.text}>Sessions: {data.used_time}/{data.session}</Text>
+                    <Text style={styles.text}>Email: {data.email}</Text>
+                    <Text style={styles.text}>Phone: {data.phone_number}</Text>
+                </View>
+        
+            ))}
+        </ScrollView>
     )
 }
 
 export default ReregisterMemberScreen
+
+const styles = StyleSheet.create({
+    container: {
+        height:'auto',
+        padding: 10,
+    },
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 15,
+        marginBottom: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    text: {
+        fontSize: 16,
+        marginBottom: 5,
+    }
+});

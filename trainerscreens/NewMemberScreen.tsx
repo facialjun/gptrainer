@@ -106,7 +106,7 @@ const NewMemberScreen:React.FunctionComponent<NewMemberScreenProps> = ({navigati
                 <View key={data.tmid} style={styles.card}>
                     {/* <Text style={styles.title}>회원번호: {data.tmid}</Text> */}
                     <Text style={styles.text}>Name: {data.username}</Text>
-                    <Text style={styles.text}>Sessions: {data.session}</Text>
+                    <Text style={styles.text}>Sessions: {data.used_time}/{data.session}</Text>
                     <Text style={styles.text}>Email: {data.email}</Text>
                     <Text style={styles.text}>Phone: {data.phone_number}</Text>
                 </View>
