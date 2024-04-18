@@ -1,16 +1,37 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react'
-import { View,Text, BackHandler, Dimensions, TouchableOpacity } from 'react-native'
+import { View,Text, BackHandler, Dimensions, TouchableOpacity,StyleSheet,Image,ScrollView } from 'react-native'
 import { TRMainScreens, TRMainStackParamList } from '../stacks/Navigator';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../config'
+import { color } from 'native-base/lib/typescript/theme/styled-system';
+
+
 
 const BASE_URL = config.SERVER_URL;
-
-
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
+
+
+export const basicDimensions = {
+  height: 852,
+  width: 393,
+};
+
+const calculateAdjustedRatio = (dimension, basicDimension) => {
+  const ratio = dimension / basicDimension;
+      if (ratio < 1) {
+          // 화면 크기가 기준치보다 작은 경우, 비율을 조정
+          return (1 / ratio).toFixed(2);
+      }
+  return ratio.toFixed(2);
+};
+
+export const height = calculateAdjustedRatio(screenHeight, basicDimensions.height);
+export const width = calculateAdjustedRatio(screenWidth, basicDimensions.width);
+//////////////////////////////////////////////////////////////// 코드 타입정의
+
 
 
 
@@ -94,50 +115,51 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
 
     
   return (
-    <View style={{height:'100%',justifyContent:'center',alignItems:'center'}}>
+    <ScrollView style={{flex:1,paddingHorizontal:24}}>
 
-    <View style={{backgroundColor:'white',height:screenHeight*0.2,width:screenWidth*0.9,borderRadius:10}}>
-        <Text style={{fontSize:18,fontWeight:'bold'}}>회원관리</Text>
-        {/* <Text style={{fontSize:13,color:'gray',marginTop:'1%'}}>회원분들을 관리하고, 만족도를 높여보세요.</Text> */}
-        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-          <View style={{width:100,height:100}}>
+    <View style={[styles.componnentBox,{marginTop:40}]}>
+        <Text style={styles.body}>회원관리</Text>
+        <Text style={[styles.captiongray,{marginTop:4}]}>회원관리를 쉽고 편하게 !</Text>
+        <View style={{flexDirection:'row',justifyContent:'space-between',backgroundColor:'white',alignItems:'center',marginTop:'auto'}}>
+          <View>
             <TouchableOpacity 
             onPress={()=>{navigation.navigate(TRMainScreens.AllMemberMain)}}
-            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
-              <Text>
+            style={{justifyContent:'flex-end',alignItems:'center'}}>
+              <Text style={styles.body}>
                 10
               </Text>
               
-              <Text>
+              <Text style={[styles.caption,,{marginTop:4}]}>
                 전체회원
               </Text>
             </TouchableOpacity>
           </View>
 
-          <View style={{width:100,height:100}}>
+          <View>
             <TouchableOpacity 
             onPress={()=>{navigation.navigate(TRMainScreens.NewMemberMain)}}
-            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
-              <Text>
+            style={{justifyContent:'flex-end',alignItems:'center',backgroundColor:'white'}}>
+               <View style={{position: 'absolute', top: 4, right: 10, width: 4, height: 4, borderRadius: 10, backgroundColor: 'red'}} />
+              <Text style={styles.body}>
                 2
               </Text>
               
-              <Text>
+              <Text style={[styles.caption,{marginTop:4}]}>
                 신규요청
               </Text>
             </TouchableOpacity>
           </View> 
 
 
-          <View style={{width:100,height:100}}>
+          <View>
             <TouchableOpacity 
             onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMemberMain)}}
-            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
-              <Text>
+            style={{justifyContent:'flex-end',alignItems:'center'}}>
+              <Text style={[styles.body]}>
                 3
               </Text>
               
-              <Text>
+              <Text style={[styles.caption,,{marginTop:4}]}>
                 종료임박
               </Text>
             </TouchableOpacity>
@@ -146,62 +168,61 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
         </View>
       </View>
 
-      <View style={{backgroundColor:'white',marginTop:'7%',height:screenHeight*0.2,width:screenWidth*0.9,borderRadius:10}}>
-        <Text style={{fontSize:18,fontWeight:'bold'}}>수업관리</Text>
-        {/* <Text style={{fontSize:13,color:'gray',marginTop:'1%'}}>요청을 확인하고 수업을 시작해보세요!</Text> */}
-      
-        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-          <View style={{width:100,height:100}}>
+      <View style={[styles.componnentBox,{marginTop:40}]}>
+        <Text style={styles.body}>수업관리</Text>
+        <Text style={[styles.captiongray,{marginTop:4}]}>수업관리를 쉽고 편하게 !</Text>
+        <View style={{flexDirection:'row',justifyContent:'space-between',backgroundColor:'white',alignItems:'center',marginTop:'auto'}}>
+          <View>
             <TouchableOpacity 
               onPress={()=>{navigation.navigate(TRMainScreens.LessonRequestMain)}}
-              style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
-              <Text>
+              style={{justifyContent:'flex-end',alignItems:'center'}}>
+              <Text style={styles.body}>
                 2
               </Text>
               
-              <Text>
+              <Text style={[styles.caption,{marginTop:4}]}>
                 수업신청
               </Text>
             </TouchableOpacity>
           </View>
 
-          <View style={{width:100,height:100}}>
+          <View>
             <TouchableOpacity 
             onPress={()=>{navigation.navigate(TRMainScreens.LessonTodayMain)}}
-            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
-              <Text>
+            style={{justifyContent:'flex-end',alignItems:'center'}}>
+              <Text style={styles.body}>
                 10
               </Text>
               
-              <Text>
+              <Text style={[styles.caption,{marginTop:4}]}>
                 오늘수업
               </Text>
             </TouchableOpacity>
           </View>
 
-          <View style={{width:100,height:100}}>
+          <View>
             <TouchableOpacity 
             onPress={()=>{navigation.navigate(TRMainScreens.LessonConfirmMain)}}
-            style={{width:100,height:100,justifyContent:'flex-end',alignItems:'center'}}>
-              <Text>
+            style={{justifyContent:'flex-end',alignItems:'center'}}>
+              <Text style={styles.body}>
                 3
               </Text>
               
-              <Text>
+              <Text style={[styles.caption,{marginTop:4}]}>
                 완료대기
               </Text>
             </TouchableOpacity>
           </View>
-
-          
         </View>
-
       </View>
       
-        <TouchableOpacity onPress={() => navigation.navigate(navigationTarget)}>
-          <View style={{backgroundColor:'#4169E1',height:screenHeight*0.1,marginTop:'7%',width:screenWidth*0.9,borderRadius:10}}>
-              <Text style={{fontSize:18,fontWeight:'bold',color:'white'}}>{buttonText}</Text>
-              <Text style={{fontSize:13,color:'white',marginTop:'1%'}}>{lessonDescription}</Text>
+        <TouchableOpacity  style={[styles.componentBox2,{marginTop:40}]} onPress={() => navigation.navigate(navigationTarget)}>
+          <View style={{flex:1,paddingHorizontal:24,alignItems:'center',flexDirection:'row'}}>
+            <Image source={require('../images/openClassIcon.png')} style={{width:28,height:28}}/>
+            <View style={{marginLeft:8}}>
+              <Text style={styles.bodyWhite}>{buttonText}</Text>
+              <Text style={[styles.captionwhite,{marginTop:4}]}>{lessonDescription}</Text>
+            </View>
           </View>
       </TouchableOpacity>
 
@@ -209,8 +230,53 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
         <Text style={{fontSize:18,fontWeight:'bold'}}>프로필 공유</Text>
         <Text style={{fontSize:13,color:'gray',marginTop:'1%'}}>링크를 공유하고, 회원스케줄을 편하게 관리하세요!</Text>
       </View> */}
-    </View>
+    </ScrollView>
   )
 }
 
 export default TRhomescreen
+
+ const styles = StyleSheet.create({
+ componnentBox:{
+  backgroundColor:'white',
+  height:200/height,
+  width:'100%',
+  borderRadius:10,
+  paddingHorizontal:24,
+  paddingVertical:24
+ },
+ componentBox2:{
+  backgroundColor:'#4169E1',
+  height:90/height,
+  width:'100%',
+  borderRadius:8
+ },
+ body:{
+  fontSize:20,
+  fontWeight:'600'
+ },
+ bodyWhite:{
+  color:'white',
+  fontSize:20,
+  fontWeight:'600'
+ },
+ caption:{
+  fontSize:14,
+  fontWeight:'400'
+ },
+ captionBold:{
+  fontSize:14,
+  fontWeight:'600'
+ },
+ captiongray:{
+    color:'#868E96',
+    fontSize:14,
+    fontWeight:'400'
+ },
+ captionwhite:{
+  color:'white',
+  fontSize:14,
+  fontWeight:'400'
+}
+
+  });

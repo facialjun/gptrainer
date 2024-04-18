@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { TRMainScreens, TRMainStackParamList} from '../stacks/Navigator';
 import config from '../config'
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const BASE_URL = config.SERVER_URL;
 
@@ -68,29 +69,28 @@ const TRInfoscreen:React.FunctionComponent<TRInfoScreenProps> = ({navigation}) =
             >
         <View style={{height:'auto',backgroundColor:'white'}}>
             <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'white',paddingHorizontal:24,marginTop:30}}>
-                    
+              <Image 
+                        source={
+                            require('../images/profile.png') // gender가 null이거나 다른 값일 때 기본 이미지
+                        }
+                        style={{
+                        height: 50,
+                        width: 50,
+                        borderRadius: 45,
+                        }}
+              />
                     <View style={{height:50,backgroundColor:'white',justifyContent:'center'}}>
                         <Text style={{fontSize: 17,fontWeight:'bold',marginLeft:10,color:'#4F4F4F'}}>{userData?.username} 트레이너님!</Text>
                         <Text style={{fontSize: 13,marginLeft:10,color:'#4F4F4F'}}>안녕하세요</Text>
                     </View>    
         </View>
-        
-        
-        {/* <View style={{paddingHorizontal:24,marginTop:40,borderBottomColor:'#DEE2E6',borderBottomWidth:1}}>
-            <Text style={{fontWeight:'600',fontSize:20}}>보유회원권</Text>
-            <TouchableOpacity 
-                onPress={()=>[]}
-                style={{flexDirection:'row',alignItems:'center',marginTop:24,justifyContent:'space-between',paddingBottom:24,backgroundColor:'white'}}>
-                <Text style={{fontSize:18}}>대관/PT 이용권</Text>
-            </TouchableOpacity>
-        </View> */}
-        <View style={{paddingHorizontal:24,marginTop:24,borderBottomColor:'#DEE2E6',borderBottomWidth:1}}>
+        <View style={{paddingHorizontal:24,marginTop:40,borderBottomColor:'#DEE2E6',borderBottomWidth:1}}>
             <Text style={{fontWeight:'600',fontSize:20}}>회원정보</Text>
             <TouchableOpacity 
                 onPress={()=>{navigation.navigate(TRMainScreens.LogInformationMain)}}
                 style={{flexDirection:'row',alignItems:'center',marginTop:24,justifyContent:'space-between',paddingBottom:24,backgroundColor:'white'}}>
                     <Text style={{fontSize:18}}>내 계정정보</Text>
-                    {/* <AntDesign name="right" size={18} color="black" /> */}
+                   <AntDesign name="right" size={18} color="black" />
             </TouchableOpacity>
         </View>
         <View style={{paddingHorizontal:24,marginTop:24,backgroundColor:'white'}}>
@@ -99,7 +99,7 @@ const TRInfoscreen:React.FunctionComponent<TRInfoScreenProps> = ({navigation}) =
                 onPress={()=>{navigation.navigate(TRMainScreens.LessonRuleMain)}}
                 style={{flexDirection:'row',alignItems:'center',marginTop:24,justifyContent:'space-between'}}>
                     <Text style={{fontSize:18}}>트레이너 정책</Text>
-                    
+                    <AntDesign name="right" size={18} color="black" />
             </TouchableOpacity>
         </View>
 
