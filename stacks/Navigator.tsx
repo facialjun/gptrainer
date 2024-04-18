@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Dimensions, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -28,6 +29,10 @@ import LogInformationSceen from '../trainerscreens/LogInformationSceen';
 import LessonRuleScreen from '../trainerscreens/LessonRuleScreen';
 import OpenLessonTimeScreen from '../trainerscreens/OpenLessonTimeScreen';
 import NewMemberScreen from '../trainerscreens/NewMemberScreen';
+
+const screenWidth = Dimensions.get('screen').width;
+const screenHeight = Dimensions.get('screen').height;
+
 
 
 
@@ -205,30 +210,31 @@ function TRMainTabNavigator(): React.ReactElement {
             screenOptions={{
                 tabBarActiveTintColor: 'black', // 활성 탭 아이콘 및 라벨 색상
                 tabBarInactiveTintColor: 'black', // 비활성 탭 아이콘 및 라벨 색상
+              
             }}
             >
             <TRMainTab.Screen
                 name={TRMainScreens.TRhome}
                 component={TRhomescreen}
                 options={{
-                // headerTitleAlign: 'center',
-                // headerTitle: () => (
-                //         <Image 
-                //             source={require('../images/logogp1.png')}
-                //             style={{width:screenWidth*0.45,height:'70%'}}
-                //             resizeMode='cover'
-                //         />
-                    
-                // ),
-                headerShown:false,
-                    title:'홈',
-                    tabBarLabel: '홈',
-                    tabBarIcon: ({ focused }) => (
-                        focused
-                        ? <Icon4 name="home-sharp" size={23} color='black' />
-                        : <Icon4 name="home-outline" size={23} color='black' />
-                    )
-                }}
+                    headerTitleAlign: 'center',
+                    headerTitle: () => (
+                            <Image 
+                                source={require('../images/logogp1.png')}
+                                style={{width:screenWidth*0.45,height:'70%'}}
+                                resizeMode='cover'
+                            />
+                        
+                    ),
+                        title:'홈',
+                        tabBarLabel: '홈',
+                        tabBarIcon: ({ focused }) => (
+                            focused
+                            ? <Icon4 name="home-sharp" size={23} color='black' />
+                            : <Icon4 name="home-outline" size={23} color='black' />
+                        )
+                    }
+                }
             />
             {/* <TRMainTab.Screen
                 name={TRMainScreens.LessonTodayMain}
@@ -288,7 +294,7 @@ const TRMainStackNavigator: React.FunctionComponent = () => {
             <TRMainStack.Screen name={TRMainScreens.ForgotPassword} component={ForgotPasswordScreen}/>
             <TRMainStack.Screen name={TRMainScreens.NewPassword} component={NewPasswordScreen}/>
             <TRMainStack.Screen name={TRMainScreens.TRsu} component={TRsignupStackNavigator}/>
-            <TRMainStack.Screen name ={TRMainScreens.TRMain} component={TRMainTabNavigator}/>
+            <TRMainStack.Screen name ={TRMainScreens.TRMain} component={TRMainTabNavigator} />
             <TRMainStack.Screen name={TRMainScreens.LessonTodayMain} component={LessonTodayMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.LessonRequestMain} component={LessonRequestMainStackNavigator} />
             <TRMainStack.Screen name={TRMainScreens.LessonConfirmMain} component={LessonConfirmMainStackNavigator} />
