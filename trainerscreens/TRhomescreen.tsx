@@ -6,6 +6,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../config'
 import { color } from 'native-base/lib/typescript/theme/styled-system';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 
 
@@ -19,7 +20,7 @@ export const basicDimensions = {
   width: 393,
 };
 
-const calculateAdjustedRatio = (dimension, basicDimension) => {
+const calculateAdjustedRatio = (dimension: number, basicDimension: number) => {
   const ratio = dimension / basicDimension;
       if (ratio < 1) {
           // 화면 크기가 기준치보다 작은 경우, 비율을 조정
@@ -70,10 +71,11 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
                   // logId를 사용하여 사용자의 uid를 가져오는 요청
                   const userResponse = await axios.get(`${BASE_URL}/Tuser/${logId}`);
                   if (userResponse.status === 200) {
-                      const uid = userResponse.data.uid;
+                      const Trainerid = userResponse.data.Trainer_id;
+                      console.log(Trainerid)
 
                       // uid를 사용하여 사용자의 available_times 정보를 가져오는 요청
-                      const timesResponse = await axios.get(`${BASE_URL}/userAvailableTimes/${uid}`);
+                      const timesResponse = await axios.get(`${BASE_URL}/userAvailableTimes/${Trainerid}`);
                       if (timesResponse.data.hasAvailableTimes) {
                         
                           // 여기에서 UI 업데이트 로직을 추가
@@ -113,17 +115,22 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
         return () => backHandler.remove();
     }, []);
 
-    
+    const navigateToAllMemberMain = () => {
+      navigation.navigate(TRMainScreens.AllMemberMain);
+
+  };
+  
+  
   return (
     <ScrollView style={{flex:1,paddingHorizontal:24}}>
 
     <View style={[styles.componnentBox,{marginTop:40}]}>
         <Text style={styles.body}>회원관리</Text>
         <Text style={[styles.captiongray,{marginTop:4}]}>회원관리를 쉽고 편하게 !</Text>
-        <View style={{flexDirection:'row',justifyContent:'space-between',backgroundColor:'white',alignItems:'center',marginTop:'auto'}}>
+        <View style={{flexDirection:'row',justifyContent:'space-between',backgroundColor:'white',alignItems:'center',marginTop:24}}>
           <View>
             <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.AllMemberMain)}}
+            onPress={()=>{navigateToAllMemberMain()}}
             style={{justifyContent:'flex-end',alignItems:'center'}}>
               <Text style={styles.body}>
                 10
@@ -137,7 +144,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
 
           <View>
             <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.NewMemberMain)}}
+            onPress={()=>{navigateToAllMemberMain()}}
             style={{justifyContent:'flex-end',alignItems:'center',backgroundColor:'white'}}>
                <View style={{position: 'absolute', top: 4, right: 10, width: 4, height: 4, borderRadius: 10, backgroundColor: 'red'}} />
               <Text style={styles.body}>
@@ -153,7 +160,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
 
           <View>
             <TouchableOpacity 
-            onPress={()=>{navigation.navigate(TRMainScreens.ReregisterMemberMain)}}
+            onPress={()=>{ navigateToAllMemberMain()}}
             style={{justifyContent:'flex-end',alignItems:'center'}}>
               <Text style={[styles.body]}>
                 3
@@ -171,7 +178,7 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
       <View style={[styles.componnentBox,{marginTop:40}]}>
         <Text style={styles.body}>수업관리</Text>
         <Text style={[styles.captiongray,{marginTop:4}]}>수업관리를 쉽고 편하게 !</Text>
-        <View style={{flexDirection:'row',justifyContent:'space-between',backgroundColor:'white',alignItems:'center',marginTop:'auto'}}>
+        <View style={{flexDirection:'row',justifyContent:'space-between',backgroundColor:'white',alignItems:'center',marginTop:24}}>
           <View>
             <TouchableOpacity 
               onPress={()=>{navigation.navigate(TRMainScreens.LessonRequestMain)}}
@@ -217,12 +224,13 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
       </View>
       
         <TouchableOpacity  style={[styles.componentBox2,{marginTop:40}]} onPress={() => navigation.navigate(navigationTarget)}>
-          <View style={{flex:1,paddingHorizontal:24,alignItems:'center',flexDirection:'row'}}>
+          <View style={{flex:1,paddingHorizontal:24,alignItems:'center',flexDirection:'row',paddingVertical:8}}>
             <Image source={require('../images/openClassIcon.png')} style={{width:28,height:28}}/>
             <View style={{marginLeft:8}}>
               <Text style={styles.bodyWhite}>{buttonText}</Text>
               <Text style={[styles.captionwhite,{marginTop:4}]}>{lessonDescription}</Text>
             </View>
+            <AntDesign style={{marginLeft:'auto'}} name='plus' size={18} color='white'/>
           </View>
       </TouchableOpacity>
 
@@ -239,17 +247,18 @@ export default TRhomescreen
  const styles = StyleSheet.create({
  componnentBox:{
   backgroundColor:'white',
-  height:200/height,
+  height:'auto',
   width:'100%',
   borderRadius:10,
   paddingHorizontal:24,
-  paddingVertical:24
+  paddingVertical:24,
  },
  componentBox2:{
   backgroundColor:'#4169E1',
-  height:90/height,
+  height:'auto',
   width:'100%',
-  borderRadius:8
+  borderRadius:8,
+  paddingVertical:8
  },
  body:{
   fontSize:20,

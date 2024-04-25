@@ -1,6 +1,6 @@
 const config = {
     SERVER_URL: 
-    "http://192.168.1.128:8080"
+    "http://192.168.1.108:8080"
     // "https://gymprivateserver.com"
 };
 
