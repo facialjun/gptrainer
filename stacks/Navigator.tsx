@@ -29,6 +29,7 @@ import LogInformationSceen from '../trainerscreens/LogInformationSceen';
 import LessonRuleScreen from '../trainerscreens/LessonRuleScreen';
 import OpenLessonTimeScreen from '../trainerscreens/OpenLessonTimeScreen';
 import NewMemberScreen from '../trainerscreens/NewMemberScreen';
+import TrainingMemberProfile from '../trainerscreens/TrainingMemberProfileScreen';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -56,7 +57,8 @@ export enum TRMainScreens {
     OpenLessonMain='OpenLessonMain',
     AdjustLessonMain='AdjustLessonMain',
     LogInformationMain='LogInformationMain',
-    LessonRuleMain='LessonRuleMain'
+    LessonRuleMain='LessonRuleMain',
+    TrainingMemberProfile ='TrainingMemberProfile'
 };
 
 
@@ -81,6 +83,7 @@ export type TRMainStackParamList = {
     AdjustLessonMain:undefined;
     LogInformationMain:undefined;
     LessonRuleMain:undefined;
+    TrianingMemberProfile:undefined
 }
 
 type TRMainTabParamList= {
@@ -147,11 +150,13 @@ export type AdjustLessonMainStackParamList = {
 };
 
 export enum AllMemberMainScreens {
-    AllMember ='AllMember'
+    AllMember ='AllMember',
+    TrianingMemberProfile='TrianingMemberProfile'
 };
 
 export type AllMemberMainStackParamList = {
     AllMember:undefined;
+    TrianingMemberProfile:undefined;
 };
 
 export enum NewMemberMainScreens {
@@ -369,7 +374,7 @@ const AllMemberMainStackNavigator: React.FunctionComponent = () => {
     return (
             <AllMemberMainStack.Navigator screenOptions={{ headerShown : false, headerBackTitleVisible: false}}>
                 <AllMemberMainStack.Screen name={AllMemberMainScreens.AllMember} component={AllMemberScreen} />
-                
+                <AllMemberMainStack.Screen name={AllMemberMainScreens.TrianingMemberProfile} component={TrainingMemberProfile} />
             </AllMemberMainStack.Navigator>
     );
 }

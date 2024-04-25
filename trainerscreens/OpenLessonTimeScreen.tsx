@@ -10,7 +10,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../config'
 import uuid from 'react-native-uuid';
-import { height} from './TRhomescreen';
+import { height, width} from './TRhomescreen';
 
 const BASE_URL = config.SERVER_URL;
 
@@ -96,7 +96,7 @@ const handleSetStartTime = async (time, id) => {
     setAllDayLessonTimes(updatedTimes);
 };
 
-// 종료 시간 설정 함수
+// 마지막 시간 설정 함수
 const handleSetEndTime = async (time, id) => {
     setEndTimePickerVisible(false); // TimePicker 숨기기
     await AsyncStorage.setItem('selectedEndTime', time);
@@ -175,7 +175,7 @@ const addAllDayLessonTimeToDB = async () => {
             addLessonTime(day, '00:00', '00:00');
         };
     
-    // // 시작 시간 또는 종료 시간 편집을 위한 함수
+    // // 시작 시간 또는 마지막 시간 편집을 위한 함수
     const editTimeSlot = (day, id, type) => {
         setCurrentEditing({ day, id, type });
         setIsTimePickerVisible(true);
@@ -304,6 +304,14 @@ const addAllDayLessonTimeToDB = async () => {
                                 </View>
                                 {allDayLessonTimes.map((item, index) => (
                                     <View key={item.id} style={styles.TimeSelectBox}>
+                                       {index === 0 && (
+                                            <View style={{ position: 'absolute', left: '50%', bottom: 50/height}}>
+                                                <View style={{ backgroundColor: 'rgba(65, 105, 225, 0.9)', borderRadius: 14, paddingLeft: 12 ,paddingRight:12, paddingVertical:6}}>
+                                                    <Text style={{ color: 'white', fontSize: 12 ,fontWeight:'600'}}>회원이 선택할 수 있는 마지막 시간</Text>
+                                                </View>
+                                                <View style={{ width: 0, height: 0, borderTopColor: 'rgba(65, 105, 225, 0.9)', borderWidth: 8, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: 'transparent', position: 'absolute', bottom: -16, left: '16%', marginLeft: -5 }} />
+                                            </View>
+                                        )}
                                         <TouchableOpacity onPress={() => { setStartTimePickerVisible(true); setEditingTimeSlotId(item.id); }}>
                                            <View style={{flexDirection:'row'}}>
                                            <Text>시작: </Text>
@@ -318,7 +326,7 @@ const addAllDayLessonTimeToDB = async () => {
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={() => { setEndTimePickerVisible(true); setEditingTimeSlotId(item.id); }}>
                                             <View style={{flexDirection:'row'}}>
-                                                <Text>종료: </Text>
+                                                <Text>마지막: </Text>
                                                 {item.endTime ? (
                                                 <Text style={{ color: "black", fontWeight: 600 }}>
                                                 {item.endTime}
@@ -326,6 +334,7 @@ const addAllDayLessonTimeToDB = async () => {
                                             ) : (
                                                 <Text>00:00</Text>
                                             )}
+                                           
                                            </View> 
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={() => allDayRemoveLessonTime(item.id)}>
@@ -354,7 +363,7 @@ const addAllDayLessonTimeToDB = async () => {
 
                     <View style={{height:'auto'}}>
                         <View style={{flexDirection:'row',backgroundColor:'white',alignItems:'center',marginTop:40,paddingBottom:24}}>
-                          <Text style={{ fontSize: 20, fontWeight: 'bod',}}>수업 가능시간</Text>
+                          <Text style={{ fontSize: 20, fontWeight: 'bold',}}>수업 가능시간</Text>
                         </View>
                         {Object.keys(lessonTimes).map((day) => (
                             <View key={day} style={{ width: '100%',borderBottomWidth:1,borderBottomColor:'#DEE2E6',paddingBottom:24,marginBottom:24}}>
@@ -379,7 +388,7 @@ const addAllDayLessonTimeToDB = async () => {
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endtime')}>
                                     <View style={{flexDirection:'row'}}>
-                                        <Text>종료: </Text>
+                                        <Text>마지막: </Text>
                                         {timeSlot.endtime ? <Text style={{fontWeight:'600'}}>{timeSlot.endtime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
                                     </View>
                                 </TouchableOpacity>
@@ -438,7 +447,7 @@ const addAllDayLessonTimeToDB = async () => {
                                                 </TouchableOpacity>
                                                 <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endtime')}>
                                                     <View style={{flexDirection:'row'}}>
-                                                        <Text>종료: </Text>
+                                                        <Text>마지막: </Text>
                                                         {timeSlot.endtime ? <Text style={{fontWeight:'600'}}>{timeSlot.endtime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
                                                     </View>
                                                 </TouchableOpacity>
