@@ -1,6 +1,6 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react'
-import { View,Text, BackHandler, Dimensions, TouchableOpacity,StyleSheet,Image,ScrollView } from 'react-native'
+import { View,Text, BackHandler, Dimensions, TouchableOpacity,StyleSheet,Image,ScrollView ,RefreshControl} from 'react-native'
 import { TRMainScreens, TRMainStackParamList } from '../stacks/Navigator';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -122,7 +122,9 @@ const TRhomescreen:React.FunctionComponent<TRhomeScreenProps> = ({navigation}) =
   
   
   return (
-    <ScrollView style={{flex:1,paddingHorizontal:24}}>
+    <ScrollView 
+    // refreshControl={}
+    style={{flex:1,paddingHorizontal:24}}>
 
     <View style={[styles.componnentBox,{marginTop:40}]}>
         <Text style={styles.body}>회원관리</Text>

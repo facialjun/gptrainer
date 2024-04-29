@@ -29,7 +29,8 @@ interface OpenLessonTimeScreenProps {
 };
 
 // 필터 상태 타입
-type FilterType = '매일 같아요' | '요일별로 달라요' | '평일/주말 달라요';
+type FilterType = '매일 같아요' 
+// | '요일별로 달라요' | '평일/주말 달라요';
 
 
 
@@ -59,7 +60,7 @@ useEffect(() => {
         try {
             // AsyncStorage에서 logId 가져오기
             let logId = await AsyncStorage.getItem('logId');
-            console.log(logId)
+            // console.log("로그아이디",logId)
             if (logId) {
                 logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
 
@@ -129,15 +130,19 @@ const handleSetEndTime = async (time, id) => {
 const addAllDayLessonTimeToDB = async () => {
     // AsyncStorage에서 logId 직접 가져오기
     let logId = await AsyncStorage.getItem('logId');
+
+    
     if (logId) {
-        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
+        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거// logId에서 따옴표 제거
+        console.log("db 보낼때 로그아이디",logId);
+
 
         const timeSlots = allDayLessonTimes.map(slot => ({
             day_of_week: 'All', // 또는 다른 요일을 지정
             start_time: slot.startTime,
             end_time: slot.endTime
         }));
-        console.log(logId);
+        
 
         try {
             // Axios 라이브러리를 사용하여 서버에 POST 요청, 여기에 logId를 포함하여 전송
@@ -170,113 +175,113 @@ const addAllDayLessonTimeToDB = async () => {
 
     ////////요일별
 
-    const handleAddLessonTime = (day) => {
-            // 여기서는 예시로 '00:00'을 기본 값으로 사용합니다.
-            addLessonTime(day, '00:00', '00:00');
-        };
+//     const handleAddLessonTime = (day) => {
+//             // 여기서는 예시로 '00:00'을 기본 값으로 사용합니다.
+//             addLessonTime(day, '00:00', '00:00');
+//         };
     
-    // // 시작 시간 또는 마지막 시간 편집을 위한 함수
-    const editTimeSlot = (day, id, type) => {
-        setCurrentEditing({ day, id, type });
-        setIsTimePickerVisible(true);
-    };
+//     // // 시작 시간 또는 마지막 시간 편집을 위한 함수
+//     const editTimeSlot = (day, id, type) => {
+//         setCurrentEditing({ day, id, type });
+//         setIsTimePickerVisible(true);
+//     };
 
-    // TimePicker에서 시간 선택 후 콜백
-        const handleTimeSelected = (selectedTime) => {
-            const { day, id, type } = currentEditing;
-            const updatedLessonTimes = { ...lessonTimes };
-            const updatedTimeSlots = updatedLessonTimes[day].map(slot => {
-            if (slot.id === id) {
-                return { ...slot, [type]: selectedTime };
-            }
-            return slot;
-            });
+//     // TimePicker에서 시간 선택 후 콜백
+//         const handleTimeSelected = (selectedTime) => {
+//             const { day, id, type } = currentEditing;
+//             const updatedLessonTimes = { ...lessonTimes };
+//             const updatedTimeSlots = updatedLessonTimes[day].map(slot => {
+//             if (slot.id === id) {
+//                 return { ...slot, [type]: selectedTime };
+//             }
+//             return slot;
+//             });
 
-            setLessonTimes({ ...updatedLessonTimes, [day]: updatedTimeSlots });
-            setIsTimePickerVisible(false);
-        };
+//             setLessonTimes({ ...updatedLessonTimes, [day]: updatedTimeSlots });
+//             setIsTimePickerVisible(false);
+//         };
 
 
-    const weeklyChangeableToDB = async () => {
-    let logId = await AsyncStorage.getItem('logId');
-    if (logId) {
-        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
+//     const weeklyChangeableToDB = async () => {
+//     let logId = await AsyncStorage.getItem('logId');
+//     if (logId) {
+//         logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
 
-        const timeSlots = Object.keys(lessonTimes).flatMap(day =>
-            lessonTimes[day].map(slot => ({ day_of_week: day, start_time: slot.startTime, end_time: slot.endTime }))
-        );
+//         const timeSlots = Object.keys(lessonTimes).flatMap(day =>
+//             lessonTimes[day].map(slot => ({ day_of_week: day, start_time: slot.startTime, end_time: slot.endTime }))
+//         );
 
-        try {
-            const response = await axios.post(`${BASE_URL}/weeklyChangeable-times`, {
-                logId,
-                timeSlots
-            });
-            console.log('Data saved:', response.data);
-            Alert.alert(
-                '수업개설 완료',
-                '수업이 개설되었습니다!',
-                [
-                    { text: '확인', onPress: () => navigation.navigate(TRMainScreens.TRMain) }
-                ],
-                { cancelable: false }
-            );
-        } catch (error) {
-            console.error('Error submitting lesson times:', error);
-        }
-    } else {
-        console.error('No logId found in AsyncStorage.');
-    }
-};
+//         try {
+//             const response = await axios.post(`${BASE_URL}/weeklyChangeable-times`, {
+//                 logId,
+//                 timeSlots
+//             });
+//             console.log('Data saved:', response.data);
+//             Alert.alert(
+//                 '수업개설 완료',
+//                 '수업이 개설되었습니다!',
+//                 [
+//                     { text: '확인', onPress: () => navigation.navigate(TRMainScreens.TRMain) }
+//                 ],
+//                 { cancelable: false }
+//             );
+//         } catch (error) {
+//             console.error('Error submitting lesson times:', error);
+//         }
+//     } else {
+//         console.error('No logId found in AsyncStorage.');
+//     }
+// };
     
 
         ////////평일,주말
 
-        const handleWeekendTimeSelected = (selectedTime) => {
-            const { day, id, type } = currentEditing;
-            const updatedWeekendLessonTimes = { ...weekendLessonTimes };
-            const updatedTimeSlots = updatedWeekendLessonTimes[day].map(slot => {
-                if (slot.id === id) {
-                    return { ...slot, [type]: selectedTime };
-                }
-                return slot;
-            });
+//         const handleWeekendTimeSelected = (selectedTime) => {
+//             const { day, id, type } = currentEditing;
+//             const updatedWeekendLessonTimes = { ...weekendLessonTimes };
+//             const updatedTimeSlots = updatedWeekendLessonTimes[day].map(slot => {
+//                 if (slot.id === id) {
+//                     return { ...slot, [type]: selectedTime };
+//                 }
+//                 return slot;
+//             });
 
-            setWeekendLessonTimes({ ...updatedWeekendLessonTimes, [day]: updatedTimeSlots });
-            setIsTimePickerVisible(false);
-        };
+//             setWeekendLessonTimes({ ...updatedWeekendLessonTimes, [day]: updatedTimeSlots });
+//             setIsTimePickerVisible(false);
+//         };
 
 
 
-        const diffWeekendToDB = async () => {
-    let logId = await AsyncStorage.getItem('logId');
-    if (logId) {
-        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
+//         const diffWeekendToDB = async () => {
+//     let logId = await AsyncStorage.getItem('logId');
+//     if (logId) {
+//         logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
 
-        const timeSlots = Object.keys(weekendLessonTimes).flatMap(day =>
-            weekendLessonTimes[day].map(slot => ({ day_of_week: day, start_time: slot.startTime, end_time: slot.endTime }))
-        );
+//         const timeSlots = Object.keys(weekendLessonTimes).flatMap(day =>
+//             weekendLessonTimes[day].map(slot => ({ day_of_week: day, start_time: slot.startTime, end_time: slot.endTime }))
+//         );
 
-        try {
-            const response = await axios.post(`${BASE_URL}/diffWeekend-times`, {
-                logId,
-                timeSlots
-            });
-            console.log('Data saved:', response.data);
-            Alert.alert(
-                '수업개설 완료',
-                '수업이 개설되었습니다!',
-                [
-                    { text: '확인', onPress: () => navigation.navigate(TRMainScreens.TRMain) }
-                ],
-                { cancelable: false }
-            );
-        } catch (error) {
-            console.error('Error submitting lesson times:', error);
-        }
-    } else {
-        console.error('No logId found in AsyncStorage.');
-    }
-};
+//         try {
+//             const response = await axios.post(`${BASE_URL}/diffWeekend-times`, {
+//                 logId,
+//                 timeSlots
+//             });
+//             console.log('Data saved:', response.data);
+//             Alert.alert(
+//                 '수업개설 완료',
+//                 '수업이 개설되었습니다!',
+//                 [
+//                     { text: '확인', onPress: () => navigation.navigate(TRMainScreens.TRMain) }
+//                 ],
+//                 { cancelable: false }
+//             );
+//         } catch (error) {
+//             console.error('Error submitting lesson times:', error);
+//         }
+//     } else {
+//         console.error('No logId found in AsyncStorage.');
+//     }
+// };
 
 
     // 필터에 따른 뷰 렌더링r
@@ -296,7 +301,7 @@ const addAllDayLessonTimeToDB = async () => {
                                     <TouchableOpacity onPress={allDayAddLessonTime} style={{marginLeft:'auto'}}>
                                     <View style={{flexDirection:'row',alignItems:'center'}}>
                                         <Text style={{fontSize:14,fontWeight:'600',color:'#4169E1'}}>
-                                          시간설정
+                                            시간설정
                                         </Text>
                                         <Icon name="down" size={18} color="#4169E1" style={{marginLeft:4}} />
                                     </View>
@@ -358,117 +363,117 @@ const addAllDayLessonTimeToDB = async () => {
 
                 )
 
-            case '요일별로 달라요':
-                return (
+            // case '요일별로 달라요':
+            //     return (
 
-                    <View style={{height:'auto'}}>
-                        <View style={{flexDirection:'row',backgroundColor:'white',alignItems:'center',marginTop:40,paddingBottom:24}}>
-                          <Text style={{ fontSize: 20, fontWeight: 'bold',}}>수업 가능시간</Text>
-                        </View>
-                        {Object.keys(lessonTimes).map((day) => (
-                            <View key={day} style={{ width: '100%',borderBottomWidth:1,borderBottomColor:'#DEE2E6',paddingBottom:24,marginBottom:24}}>
-                                <View style={{flexDirection:'row',backgroundColor:'white',alignItems:'center'}}>
-                                    <Text style={{ fontSize: 20, fontWeight: '600'}}>{day}</Text>
-                                    <TouchableOpacity  onPress={() => handleAddLessonTime(day)} style={{marginLeft:'auto'}}>
-                                    <View style={{flexDirection:'row',alignItems:'center'}}>
-                                        <Text style={{fontSize:14,fontWeight:'600',color:'#4169E1'}}>
-                                          시간설정
-                                        </Text>
-                                        <Icon name="down" size={18} color="#4169E1" style={{marginLeft:4}} />
-                                    </View>
-                                    </TouchableOpacity>
-                                </View>
-                                {lessonTimes[day].map((timeSlot) => (
-                                <View key={timeSlot.id} style={styles.TimeSelectBox}>
-                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'startTime')}>
-                                    <View style={{flexDirection:'row'}}>
-                                        <Text>시작: </Text>
-                                        {timeSlot.startTime ? <Text style={{fontWeight:'600'}}>{timeSlot.startTime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
-                                    </View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endtime')}>
-                                    <View style={{flexDirection:'row'}}>
-                                        <Text>마지막: </Text>
-                                        {timeSlot.endtime ? <Text style={{fontWeight:'600'}}>{timeSlot.endtime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
-                                    </View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => removeLessonTime(day, timeSlot.id)}>
-                                    <Icon name="closecircle" size={20} color="red" />
-                                </TouchableOpacity>
-                                </View>
-                            ))}
+            //         <View style={{height:'auto'}}>
+            //             <View style={{flexDirection:'row',backgroundColor:'white',alignItems:'center',marginTop:40,paddingBottom:24}}>
+            //               <Text style={{ fontSize: 20, fontWeight: 'bold',}}>수업 가능시간</Text>
+            //             </View>
+            //             {Object.keys(lessonTimes).map((day) => (
+            //                 <View key={day} style={{ width: '100%',borderBottomWidth:1,borderBottomColor:'#DEE2E6',paddingBottom:24,marginBottom:24}}>
+            //                     <View style={{flexDirection:'row',backgroundColor:'white',alignItems:'center'}}>
+            //                         <Text style={{ fontSize: 20, fontWeight: '600'}}>{day}</Text>
+            //                         <TouchableOpacity  onPress={() => handleAddLessonTime(day)} style={{marginLeft:'auto'}}>
+            //                         <View style={{flexDirection:'row',alignItems:'center'}}>
+            //                             <Text style={{fontSize:14,fontWeight:'600',color:'#4169E1'}}>
+            //                               시간설정
+            //                             </Text>
+            //                             <Icon name="down" size={18} color="#4169E1" style={{marginLeft:4}} />
+            //                         </View>
+            //                         </TouchableOpacity>
+            //                     </View>
+            //                     {lessonTimes[day].map((timeSlot) => (
+            //                     <View key={timeSlot.id} style={styles.TimeSelectBox}>
+            //                     <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'startTime')}>
+            //                         <View style={{flexDirection:'row'}}>
+            //                             <Text>시작: </Text>
+            //                             {timeSlot.startTime ? <Text style={{fontWeight:'600'}}>{timeSlot.startTime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
+            //                         </View>
+            //                     </TouchableOpacity>
+            //                     <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endtime')}>
+            //                         <View style={{flexDirection:'row'}}>
+            //                             <Text>마지막: </Text>
+            //                             {timeSlot.endtime ? <Text style={{fontWeight:'600'}}>{timeSlot.endtime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
+            //                         </View>
+            //                     </TouchableOpacity>
+            //                     <TouchableOpacity onPress={() => removeLessonTime(day, timeSlot.id)}>
+            //                         <Icon name="closecircle" size={20} color="red" />
+            //                     </TouchableOpacity>
+            //                     </View>
+            //                 ))}
           
-                            </View>
-                        ))}
-                        {isTimePickerVisible && (
-                            <TimePicker
-                            isVisible={isTimePickerVisible}
-                            onClose={() => setIsTimePickerVisible(false)}
-                            onConfirm={handleTimeSelected}
-                            />
-                        )}
+            //                 </View>
+            //             ))}
+            //             {isTimePickerVisible && (
+            //                 <TimePicker
+            //                 isVisible={isTimePickerVisible}
+            //                 onClose={() => setIsTimePickerVisible(false)}
+            //                 onConfirm={handleTimeSelected}
+            //                 />
+            //             )}
                         
                         
-                    </View>
+            //         </View>
                     
 
 
-                )
+            //     )
 
                 
-            case '평일/주말 달라요':
-                    return (
-                       <View style={{ backgroundColor: 'white',height:"auto" }}>
-                        <View style={{flexDirection:'row',backgroundColor:'white',alignItems:'center',marginTop:40}}>
-                                    <Text style={{ fontSize: 20, fontWeight: '600'}}>수업 가능시간</Text>
-                                    <TouchableOpacity onPress={allDayAddLessonTime} style={{marginLeft:'auto'}}>
-                                    </TouchableOpacity>
-                                </View>
-                                {diffWeekDays.map((day) => (
-                                  <View key={day} style={{marginTop:24,borderBottomWidth:1,borderBottomColor:'#DEE2E6',paddingBottom:24,marginBottom:24}}>
-                                    <View style={{flexDirection:'row'}}>
-                                       <Text style={{ fontSize: 20, fontWeight: '600' }}>{day}</Text>
-                                          <TouchableOpacity style={{marginLeft:'auto'}} onPress={() => addWeekendLessonTime(day, '00:00', '00:00')}>
-                                             <View style={{flexDirection:'row',alignItems:'center'}}>
-                                                <Text style={{fontSize:14,fontWeight:'600',color:'#4169E1'}}>
-                                                    시간설정
-                                                </Text>
-                                                <Icon name="down" size={18} color="#4169E1" style={{marginLeft:4}} />
-                                             </View>
-                                          </TouchableOpacity>
-                                    </View>
-                                        {weekendLessonTimes[day].map((timeSlot) => (
-                                            <View key={timeSlot.id} style={styles.TimeSelectBox}>
-                                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'startTime')}>
-                                                    <View style={{flexDirection:'row'}}>
-                                                        <Text>시작: </Text>
-                                                        {timeSlot.startTime ? <Text style={{fontWeight:'600'}}>{timeSlot.startTime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
-                                                    </View>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endtime')}>
-                                                    <View style={{flexDirection:'row'}}>
-                                                        <Text>마지막: </Text>
-                                                        {timeSlot.endtime ? <Text style={{fontWeight:'600'}}>{timeSlot.endtime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
-                                                    </View>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity onPress={() => removeWeekendLessonTime(day, timeSlot.id)}>
-                                                    <Icon name="closecircle" size={20} color="red" />
-                                                </TouchableOpacity>
-                                            </View>
-                                        ))}
-                                    </View>
-                                ))}
+            // case '평일/주말 달라요':
+            //         return (
+            //            <View style={{ backgroundColor: 'white',height:"auto" }}>
+            //             <View style={{flexDirection:'row',backgroundColor:'white',alignItems:'center',marginTop:40}}>
+            //                         <Text style={{ fontSize: 20, fontWeight: '600'}}>수업 가능시간</Text>
+            //                         <TouchableOpacity onPress={allDayAddLessonTime} style={{marginLeft:'auto'}}>
+            //                         </TouchableOpacity>
+            //                     </View>
+            //                     {diffWeekDays.map((day) => (
+            //                       <View key={day} style={{marginTop:24,borderBottomWidth:1,borderBottomColor:'#DEE2E6',paddingBottom:24,marginBottom:24}}>
+            //                         <View style={{flexDirection:'row'}}>
+            //                            <Text style={{ fontSize: 20, fontWeight: '600' }}>{day}</Text>
+            //                               <TouchableOpacity style={{marginLeft:'auto'}} onPress={() => addWeekendLessonTime(day, '00:00', '00:00')}>
+            //                                  <View style={{flexDirection:'row',alignItems:'center'}}>
+            //                                     <Text style={{fontSize:14,fontWeight:'600',color:'#4169E1'}}>
+            //                                         시간설정
+            //                                     </Text>
+            //                                     <Icon name="down" size={18} color="#4169E1" style={{marginLeft:4}} />
+            //                                  </View>
+            //                               </TouchableOpacity>
+            //                         </View>
+            //                             {weekendLessonTimes[day].map((timeSlot) => (
+            //                                 <View key={timeSlot.id} style={styles.TimeSelectBox}>
+            //                                     <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'startTime')}>
+            //                                         <View style={{flexDirection:'row'}}>
+            //                                             <Text>시작: </Text>
+            //                                             {timeSlot.startTime ? <Text style={{fontWeight:'600'}}>{timeSlot.startTime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
+            //                                         </View>
+            //                                     </TouchableOpacity>
+            //                                     <TouchableOpacity onPress={() => editTimeSlot(day, timeSlot.id, 'endtime')}>
+            //                                         <View style={{flexDirection:'row'}}>
+            //                                             <Text>마지막: </Text>
+            //                                             {timeSlot.endtime ? <Text style={{fontWeight:'600'}}>{timeSlot.endtime}</Text> : <Text style={{fontWeight:'600'}}>00:00</Text>}
+            //                                         </View>
+            //                                     </TouchableOpacity>
+            //                                     <TouchableOpacity onPress={() => removeWeekendLessonTime(day, timeSlot.id)}>
+            //                                         <Icon name="closecircle" size={20} color="red" />
+            //                                     </TouchableOpacity>
+            //                                 </View>
+            //                             ))}
+            //                         </View>
+            //                     ))}
                   
-                                {isTimePickerVisible && (
-                                <TimePicker
-                                    isVisible={isTimePickerVisible}
-                                    onClose={() => setIsTimePickerVisible(false)}
-                                    onConfirm={handleWeekendTimeSelected}
-                                />
-                            )}
-                        </View>
+            //                     {isTimePickerVisible && (
+            //                     <TimePicker
+            //                         isVisible={isTimePickerVisible}
+            //                         onClose={() => setIsTimePickerVisible(false)}
+            //                         onConfirm={handleWeekendTimeSelected}
+            //                     />
+            //                 )}
+            //             </View>
 
-                    )
+            //         )
                     
             }
         };
@@ -502,7 +507,11 @@ const addAllDayLessonTimeToDB = async () => {
             justifyContent: 'space-between',
             alignItems: 'center',          
             }}>
-            {(['매일 같아요', '요일별로 달라요', '평일/주말 달라요'] as FilterType[]).map((type) => (
+            {/*
+            {(['매일 같아요',
+             '요일별로 달라요', 
+             '평일/주말 달라요'
+            ] as FilterType[]).map((type) => (
             <TouchableOpacity
                 key={type}
                 onPress={() => setFilter(type)}
@@ -519,6 +528,8 @@ const addAllDayLessonTimeToDB = async () => {
             </Text>
         </TouchableOpacity>
         ))}
+            */ }
+            
        </View>
             {renderFilterView()}
         </View>

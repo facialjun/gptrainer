@@ -38,9 +38,9 @@ export const TrainingMemberProfile = ({route}) => {
     }, [data.tmid]); // d
 
     
-  return (
+    return (
     <ScrollView>
-       
+        
         <View style={{flex:1}}>
             <View style={{backgroundColor:'white',paddingHorizontal:24,paddingBottom:40}}>
             <Text style={{fontSize:24,fontWeight:'600',marginTop:30}}>
@@ -80,8 +80,11 @@ export const TrainingMemberProfile = ({route}) => {
                             <Text style={styles.body1Bold}>{detail.SessionNumber}회</Text>
                             <Text style={[styles.body2,{marginLeft:24}]}>{new Date(detail.DateofProgress).toLocaleDateString()}</Text>
                         </View>
-                        <Image source={require('/Users/isangbeom/Desktop/gptrainer/images/TrainingCalanderIcon.png')} style={{width:24,height:24}}/>
+
+                        <Image source={require('../images/TrainingCalenderIcon.png')} style={{width:24,height:24}}/>
+                    
                     </View>
+
                 ))}
 
          
