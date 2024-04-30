@@ -36,7 +36,6 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [membershipData, setMembershipData] = useState([]);
-    
 
     useEffect(() => {
             const backAction = () => {
@@ -52,38 +51,36 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
             return () => backHandler.remove();
         }, [navigation]); // 의존성 배열에 navigation 추가
 
-        useEffect(() => {
-            const fetchData = async () => {
-                setIsLoading(true);
-                try {
-                    // AsyncStorage에서 logId 가져오기
-                    let logId = await AsyncStorage.getItem('logId');
-                    if (logId) {
-                        logId = logId.replace(/^['"](.*)['"]$/, '$1'); // logId에서 따옴표 제거
-    
-                        // logId를 사용하여 사용자 데이터 가져오기
-                        const userResponse = await axios.get(`${BASE_URL}/Tuser/${logId}`);
-                        if (userResponse.status === 200) {
-                            const userData = userResponse.data;
-                            console.log('Fetched User Data:', userData);
-    
-                            // Trainer_id로 TrainingMembership 데이터 조회
-                            const membershipResponse = await axios.get(`${BASE_URL}/TrainingMembership/${userData.Trainer_id}`);
-                            if (membershipResponse.status === 200) {
-                                setMembershipData(membershipResponse.data);
-                                console.log('Fetched Membership Data:', membershipResponse.data);
-                            }
-                        }
+    useEffect(() => {
+    const fetchData = async () => {
+        setIsLoading(true);
+        try {
+            let logId = await AsyncStorage.getItem('logId');
+            if (logId) {
+                logId = logId.replace(/^['"](.*)['"]$/, '$1');
+                const userResponse = await axios.get(`${BASE_URL}/Tuser/${logId}`);
+                if (userResponse.status === 200) {
+                    const userData = userResponse.data;
+
+                    const membershipResponse = await axios.get(`${BASE_URL}/TrainingMembership/${userData.Trainer_id}`);
+                    if (membershipResponse.status === 200 && membershipResponse.data.length > 0) {
+                        setMembershipData(membershipResponse.data);
+                    } else if (membershipResponse.data.message) {
+                        console.log(membershipResponse.data.message); // 서버로부터 "값이 없습니다" 메시지를 받을 경우 로깅
+                        setMembershipData([]); // 데이터가 없으면 빈 배열을 설정
                     }
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    setIsLoading(false);
                 }
-            };
-    
-            fetchData();
-        }, []);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    fetchData();
+}, []);
+
 
 
         // useEffect(() => {
@@ -125,6 +122,12 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
         );
 
         const renderMembershipData = (selectedTab) => {
+            if (membershipData.length === 0) {
+                return <View style={styles.noDataView}>
+                    <Text style={styles.noDataText}>회원 내역이 없습니다.</Text>
+                </View>;
+            }
+
             if (selectedTab === 'allMembers') {
                 return membershipData.map((data) => (
                     <TouchableOpacity key={data.tmid} style={styles.card} onPress={() => navigation.navigate('TrianingMemberProfile', { data })}>
@@ -185,7 +188,6 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
 export default AllMemberScreen
 
 const styles = StyleSheet.create({
-  
     card: {
         backgroundColor: '#fff',
         borderRadius: 10,
@@ -204,16 +206,26 @@ const styles = StyleSheet.create({
     body2Bold:{
         fontSize:18,
         fontWeight:'600'
-       },
+    },
     body3Primary:{
-     fontSize:16,
-     fontWeight:'400',
-     color:'#4169E1'
+        fontSize:16,
+        fontWeight:'400',
+        color:'#4169E1'
     },
     body3Red:{
         fontSize:16,
         fontWeight:'600',
         color:'red'
-       }
+    },
+    noDataView: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#868e96',
+    },
  
 });

@@ -52,7 +52,7 @@ const SplashScreen:React.FunctionComponent<SplashScreenProps> = ({navigation}) =
     // 앱 버전 확인 및 업데이트 확인
     const checkForUpdates = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/version`, {
+            const response = await axios.get(`${BASE_URL}/Tapi/version`, {
             headers: { 'App-Version': getAppVersion() },
             });
             const { updateRequired, latestVersion, isMandatory, description } = response.data;
