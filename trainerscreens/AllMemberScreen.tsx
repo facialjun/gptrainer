@@ -36,7 +36,6 @@ const AllMemberScreen:React.FunctionComponent<AllMemberScreenProps> = ({navigati
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [membershipData, setMembershipData] = useState([]);
-    
 
     useEffect(() => {
             const backAction = () => {

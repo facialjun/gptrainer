@@ -72,7 +72,7 @@ export const TrainingMemberProfile = ({route}) => {
 
             </View>
             <View style={{marginTop:24,paddingHorizontal:24,backgroundColor:'white',paddingVertical:24}}>
-               
+
                     <Text style={styles.Title}>진행이력</Text>
                     {progressData.map((detail, index) => (
                     <View key={index} style={{width:'100%',height:68,flexDirection:'row',alignItems:'center',backgroundColor:'#F8F9FA',borderRadius:8,marginTop:24,justifyContent:'space-between',paddingHorizontal:24}} >
@@ -81,14 +81,13 @@ export const TrainingMemberProfile = ({route}) => {
                             <Text style={[styles.body2,{marginLeft:24}]}>{new Date(detail.DateofProgress).toLocaleDateString()}</Text>
                         </View>
 
+
                         <Image source={require('../images/TrainingCalenderIcon.png')} style={{width:24,height:24}}/>
                     
+
                     </View>
 
                 ))}
-
-         
-
 
                 
 
